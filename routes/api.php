@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\WorkspaceController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -16,6 +17,9 @@ use App\Http\Controllers\AuthController;
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/logout',[AuthController::class, 'logout']);
+    Route::post('/workspace', [WorkspaceController::class,'create']);
+    Route::get('/workspace', [WorkspaceController::class,'show']);
+    
 });
 Route::post('/register', [AuthController::class,'register']);
 Route::get('/login', [AuthController::class,'login']);
