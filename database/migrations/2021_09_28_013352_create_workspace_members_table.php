@@ -13,12 +13,16 @@ class CreateWorkspaceMembersTable extends Migration
      */
     public function up()
     {
+        Schema::enableForeignKeyConstraints();
         Schema::create('workspace_members', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('workspace_id')->references('id')->on('workspaces')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('workspace_id')->constrained('workspaces')->onUpdate('cascade')->onDelete('cascade');
+            //$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            //$table->foreign('workspace_id')->references('id')->on('workspaces')->onDelete('cascade');
             $table->timestamps();
+            
+        
         });
     }
 
