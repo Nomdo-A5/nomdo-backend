@@ -27,9 +27,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('/workspace', [WorkspaceController::class,'create']);
     Route::get('/workspace', [WorkspaceController::class,'show']);
+    Route::delete('/workspace', [WorkspaceController::class,'delete']);
+    Route::patch('/workspace', [WorkspaceController::class,'update']);
     
 
 });
 
-Route::post('/register', 'AuthController@classregister');
-Route::get('/login', 'AuthController@login');
+Route::post('/register', [AuthController::class,'register']);
+Route::post('/login', [AuthController::class,'login']);
