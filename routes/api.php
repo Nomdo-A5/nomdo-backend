@@ -3,7 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+
 use App\Http\Controllers\BoardsController;
+
+use App\Http\Controllers\WorkspaceController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,8 +21,14 @@ use App\Http\Controllers\BoardsController;
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/logout',[AuthController::class, 'logout']);
+  
     Route::post('/boards','BoardsController@store');
     Route::post('/boards/update/{id?}', 'BoardsController@update');
+
+    Route::post('/workspace', [WorkspaceController::class,'create']);
+    Route::get('/workspace', [WorkspaceController::class,'show']);
+    
+
 });
 
 Route::post('/register', 'AuthController@classregister');
