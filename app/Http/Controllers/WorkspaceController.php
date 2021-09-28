@@ -6,6 +6,7 @@ use App\Models\Workspace;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 class WorkspaceController extends Controller
 {
@@ -85,11 +86,6 @@ class WorkspaceController extends Controller
     {
         //
         $user = Auth::user();
-        if($user->workspace == null){
-            return response()->json([
-                'message' => 'Workspace Unavailable'
-            ],404);
-        }
         return response()->json([
             'workspaces' => $user->workspaces,
             'message' => "Workspace fetched"
@@ -118,15 +114,14 @@ class WorkspaceController extends Controller
     public function update(Request $request)
     {
         //
-        $check = Workspace::firstWhere('id', $request->id);
-        if(!$check){
-            
+        $workspace = Workspace::firstWhere('id', $request->id);
+        if($workspace == null){            
             return response()->json([
                 'message' => 'Workspace unavailable'
             ],404);
         }
 
-        $workspace = Workspace::where('id', $request->id);
+        //$workspace = Workspace::where('id', $request->id);
         $workspace->workspace_name = $request->name;
         $workspace->save();
 
@@ -142,7 +137,7 @@ class WorkspaceController extends Controller
     public function delete(Request $request){
         $check = Workspace::firstWhere('id', $request->id);
         if($check){
-            Workspace::destroy($id);
+            Workspace::destroy($request->id);
             return response()->json([
                 'message' => 'Workspace deleted'
             ],200);
