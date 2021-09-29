@@ -7,7 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoardsController;
 
 use App\Http\Controllers\WorkspaceController;
-
+use App\Http\Controllers\TaskController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -30,7 +30,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::delete('/workspace', [WorkspaceController::class,'delete']);
     Route::patch('/workspace', [WorkspaceController::class,'update']);
     
-
+    Route::post('/task', [TaskController::class,'create']);
+    Route::get('/task', [TaskController::class, 'index']);
 });
 
 Route::post('/register', [AuthController::class,'register']);
