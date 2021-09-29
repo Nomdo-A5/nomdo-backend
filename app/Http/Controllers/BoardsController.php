@@ -103,8 +103,17 @@ class BoardsController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        $checkboards = boards::find($id);
+        if(!$checkboards){
+
+            return response()->json([
+                'message' => 'Boards unavailable'
+            ],404);
+        }
+
         $validator = Validator::make($request->all(), [
-            'nama_boards'     => 'required|unique:boards'
+            'nama_boards' => 'required|unique:boards'
 
         ],
             [
@@ -121,19 +130,18 @@ class BoardsController extends Controller
             ],400);
 
         }else{
-
             $updateboards = Boards::find($id);
             $updateboards->nama_boards =  $request->get('nama_boards');
             $updateboards->save();
         if($updateboards){
             return response()->json([
                 'success' => true,
-                'message' => 'nama boards Berhasil Diupdate!',
+                'message' => 'Boards updated!',
             ], 200);
         }else{
             return response()->json([
                 'success' => false,
-                'message' => 'nama boards Gagal Diupdate!',
+                'message' => 'Failed boards updated!',
             ], 400);
         }
 
@@ -148,6 +156,21 @@ class BoardsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $deleteboards = boards::findOrFail($id);
+        $deleteboards->delete();
+
+        if ($deleteboards) {
+            return response()->json([
+                'success' => true,
+                'message' => 'boards deleted',
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'failed to delete boards',
+            ], 500);
+        }
+
     }
+
 }
