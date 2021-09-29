@@ -9,9 +9,9 @@ use Laravel\Sanctum\HasApiTokens;
 class Boards extends Model
 {
     use HasApiTokens, HasFactory;
-    
+
     protected $fillable = [
-        'nama_boards',
+        'boards_name',
 
     ];
 }
