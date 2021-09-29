@@ -15,7 +15,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        //showing all task for every user
         return response()->json(Task::all(),200);
     }
 
@@ -86,9 +86,29 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         //
+        $task = Task::firstWhere('id', $request->id);
+        if($task == null){
+            return response()->json([
+                'task' => $task,
+                'message' => 'Task unavailable'
+            ],404);
+        }
+        if($request->task_name)
+            $task->task_name = $request->task_name;
+        if($request->task_description)
+            $task->task_description = $request->task_description;
+        if($request->status)
+            $task->status = $request->status;
+        
+        $task->save();
+        return response()->json([
+            'task' => $task,
+            'message' => 'task updated'
+        ],200);
+
     }
 
     /**
