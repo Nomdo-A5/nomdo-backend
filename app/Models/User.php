@@ -44,4 +44,8 @@ class User extends Authenticatable
     public function workspaces(){
         return $this->belongsToMany(Workspace::class,'workspace_members','user_id','workspace_id');
     }
+
+    public function tasks(){
+        return $this->belongsToMany(Task::class,'task_members','user_id','task_id');
+    }
 }

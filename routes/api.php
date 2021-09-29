@@ -7,7 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoardsController;
 
 use App\Http\Controllers\WorkspaceController;
-
+use App\Http\Controllers\TaskController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -24,23 +24,20 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('/boards', 'BoardsController@index');
     Route::post('/boards/store','BoardsController@store');
-    Route::get('/article/edit/{id}', 'ArticleController@getArticle');
+    Route::get('/boards/edit/{id}', 'BoardsController@edit');
     Route::put('/boards/update/{id}', 'BoardsController@update');
     Route::delete('boards/delete/{id}','BoardsController@delete');
 
     Route::post('/workspace', [WorkspaceController::class,'create']);
     Route::get('/workspace', [WorkspaceController::class,'show']);
-
+    Route::delete('/workspace', [WorkspaceController::class,'delete']);
+    Route::patch('/workspace', [WorkspaceController::class,'update']);
+    
+    Route::post('/task', [TaskController::class,'create']);
+    Route::get('/task', [TaskController::class, 'index']);
 
 });
 
 Route::post('/register', 'AuthController@register');
 Route::get('/login', 'AuthController@login');
 
-
-Route::get('/articles', 'ArticleController@index');
-Route::post('/article/store', 'ArticleController@store');
-Route::get('/article/edit/{id}', 'ArticleController@getArticle');
-Route::get('/article/{id}', 'ArticleController@getArticle');
-Route::put('/article/{id}', 'ArticleController@update');
-Route::delete('/article/delete/{id}', 'ArticleController@delete');
