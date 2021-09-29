@@ -36,7 +36,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/task', [TaskController::class,'create']);
     Route::get('/task', [TaskController::class, 'index']);
     Route::patch('/task',[TaskController::class, 'update']);
-
+    Route::delete('/task',[TaskController::class, 'delete']);
 });
 
 Route::post('/register', 'AuthController@register');

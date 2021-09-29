@@ -111,6 +111,21 @@ class TaskController extends Controller
 
     }
 
+    public function delete(Request $request){
+        $task = Task::firstWhere('id', $request->id);
+        if($task){
+            Task::destroy($request->id);
+            return response()->json([
+                'message' => 'Task deleted'
+            ],200);
+        }
+        else{
+            return response()->json([
+                'message' => 'failed to delete workspace'
+            ],404);
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      *
