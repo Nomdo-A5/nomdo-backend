@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 class TaskController extends Controller
 {
@@ -13,9 +15,23 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        if($request->id){
+            $task = Task::firstWhere('id', $request->id);
+            if($task){
+                return response()->json([
+                    'task' => $task,
+                ],200);
+            }
+            else{
+                return response()->json([
+                    'task' =>$task,
+                    'message' => 'task unavalable',
+                ],404);
+            }
+        }
+        //showing all task for every user
         return response()->json(Task::all(),200);
     }
 
@@ -39,10 +55,11 @@ class TaskController extends Controller
 
         $data->save();
         $task_id = $data->id;
-        //$user->tasks()->attach($task_id);
+       // $user->tasks()->attach($task_id);
         
         return response()->json([
-            'task' => $data,           
+            'task' => $data,
+            //'member' => $data->users,           
         ], 200);
     }
 
@@ -86,9 +103,56 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         //
+        $task = Task::firstWhere('id', $request->id);
+        
+        if($task == null){
+            return response()->json([
+                'task' => $task,
+                'message' => 'Task unavailable'
+            ],404);
+        }
+
+        if($request->member_id){
+            $user = User::firstWhere('id', $request->member_id);
+            
+            $user->tasks()->attach($task->id);
+            return response()->json([
+                'task' => $task,
+                'message' => 'Task member update'
+            ],200);
+        }
+
+        if($request->task_name)
+            $task->task_name = $request->task_name;
+        if($request->task_description)
+            $task->task_description = $request->task_description;
+        if($request->status)
+            $task->status = $request->status;
+        
+        $task->save();
+        return response()->json([
+            'task' => $task,
+            'message' => 'task updated'
+        ],200);
+
+    }
+
+    public function delete(Request $request){
+        $task = Task::firstWhere('id', $request->id);
+        if($task){
+            Task::destroy($request->id);
+            return response()->json([
+                'message' => 'Task deleted'
+            ],200);
+        }
+        else{
+            return response()->json([
+                'message' => 'failed to delete workspace'
+            ],404);
+        }
     }
 
     /**
