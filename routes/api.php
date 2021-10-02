@@ -20,24 +20,23 @@ use App\Http\Controllers\TaskController;
 */
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::post('/logout', 'AuthController@logout');
+    Route::post('/logout', [AuthController::class,'logout']);
 
-    Route::get('/boards', 'BoardsController@index');
-    Route::post('/boards/store','BoardsController@store');
-    Route::get('/boards/edit/{id}', 'BoardsController@edit');
-    Route::put('/boards/update/{id}', 'BoardsController@update');
-    Route::delete('boards/delete/{id}','BoardsController@delete');
+    Route::get('/boards',  [BoardsController::class,'index']);
+    Route::post('/boards', [BoardsController::class,'store']);
+    Route::get('/boards', [WorkspaceController::class,'edit']);
+    Route::put('/boards',  [WorkspaceController::class,'update']);
+    Route::delete('/boards', [WorkspaceController::class,'delete']);
 
     Route::post('/workspace', [WorkspaceController::class,'create']);
     Route::get('/workspace', [WorkspaceController::class,'show']);
     Route::delete('/workspace', [WorkspaceController::class,'delete']);
     Route::patch('/workspace', [WorkspaceController::class,'update']);
-    
+
     Route::post('/task', [TaskController::class,'create']);
     Route::get('/task', [TaskController::class, 'index']);
 
 });
 
-Route::post('/register', 'AuthController@register');
-Route::get('/login', 'AuthController@login');
-
+Route::post('/register',  [AuthController::class,'register']);
+Route::get('/login',  [AuthController::class,'login']);
