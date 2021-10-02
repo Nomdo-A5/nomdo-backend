@@ -20,7 +20,7 @@ use App\Http\Controllers\TaskController;
 */
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::post('/logout', 'AuthController@logout');
+    Route::post('/logout', [AuthController::class,'logout']);
 
     Route::get('/boards', 'BoardsController@index');
     Route::post('/boards/store','BoardsController@store');
@@ -39,6 +39,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
 });
 
-Route::post('/register', 'AuthController@register');
-Route::get('/login', 'AuthController@login');
+Route::post('/register', [AuthController::class,'register']);
+Route::post('/login', [AuthController::class,'login']);
 
