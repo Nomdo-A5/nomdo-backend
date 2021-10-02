@@ -41,11 +41,11 @@ class BoardsController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(),[
-            'nama_boards' => 'required|unique:boards'
+            'boards_name' => 'required|unique:boards'
         ],
 
         [
-            'nama_boards.required' => 'Masukkan Nama board !',
+            'boards_name.required' => 'Masukkan Nama board !',
 
         ]
     );
@@ -113,11 +113,11 @@ class BoardsController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'nama_boards' => 'required|unique:boards'
+            'boards_name' => 'required|unique:boards'
 
         ],
             [
-                'nama_boards.required' => 'Masukkan Nama board !',
+                'boards_name.required' => 'Masukkan Nama board !',
 
             ]
         );

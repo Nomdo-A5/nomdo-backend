@@ -14,4 +14,7 @@ class Boards extends Model
         'boards_name',
 
     ];
+    public function workspace(){
+        return $this->belongsTo(Workspace::class,'workspace_id','id');
+    }
 }

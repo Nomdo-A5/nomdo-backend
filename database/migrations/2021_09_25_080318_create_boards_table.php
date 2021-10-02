@@ -13,12 +13,13 @@ class CreateBoardsTable extends Migration
      */
     public function up()
     {
+        Schema::enableForeignKeyConstraints();
         Schema::create('boards', function (Blueprint $table) {
             $table->id();
-            $table->bigIncrements('id_boards');
             $table->string('boards_name');
-            $table->timestamps();
-            $table->foreign('id_boards')->references('id')->on('workspaces')->onDelete('cascade');
+            $table->foreignId('workspace_id')->constrained('workspaces')->onUpdate('cascade')->onDelete('cascade');
+             $table->timestamps();
+
 
         });
     }
