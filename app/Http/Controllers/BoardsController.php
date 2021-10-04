@@ -17,7 +17,7 @@ class BoardsController extends Controller
         $boards = Boards::latest()->all();
         return response([
             'success' => true,
-            'message' => 'List Semua Posts',
+            'message' => 'List all board',
             'data' => $boards
         ], 200);
     }
@@ -61,7 +61,8 @@ class BoardsController extends Controller
             if ($createboards) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'nama boards Berhasil Disimpan!',
+                    'message' => 'Board created',
+                    'board'   => $createboards,
                 ], 200);
             } else {
                 return response()->json([
@@ -103,8 +104,7 @@ class BoardsController extends Controller
      */
     public function update(Request $request, $id)
     {
-
-        $checkboards = boards::find($id);
+        $checkboards = Boards::find($id);
         if(!$checkboards){
 
             return response()->json([
@@ -156,7 +156,7 @@ class BoardsController extends Controller
      */
     public function destroy($id)
     {
-        $deleteboards = boards::findOrFail($id);
+        $deleteboards = Boards::findOrFail($id);
         $deleteboards->delete();
 
         if ($deleteboards) {
