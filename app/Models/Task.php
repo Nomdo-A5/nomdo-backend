@@ -17,4 +17,8 @@ class Task extends Model
     public function users(){
         return $this->belongsToMany(User::class, 'task_members','task_id','user_id');
     }
+
+    public function boards(){
+        return $this->belongsToMany(Board::class, 'board_tasks','task_id','board_id');
+    }
 }

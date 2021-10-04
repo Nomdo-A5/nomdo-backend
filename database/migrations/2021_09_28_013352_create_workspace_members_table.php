@@ -19,6 +19,7 @@ class CreateWorkspaceMembersTable extends Migration
             $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('workspace_id')->constrained('workspaces')->onUpdate('cascade')->onDelete('cascade');
             $table->unique(['user_id', 'workspace_id']);
+            $table->boolean('is_owner')->default(false);
             $table->timestamps();         
         
         });

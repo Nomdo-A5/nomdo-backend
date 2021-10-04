@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTasksTable extends Migration
+class CreateReportsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateTasksTable extends Migration
      */
     public function up()
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('reports', function (Blueprint $table) {
             $table->id();
-            $table->string('task_name');
-            $table->string('task_description')->nullable();
-            $table->boolean('is_done')->default(false);
+            $table->foreignId('workspace_id')->constrained('workspaces')->onUpdate('cascade')->onDelete('cascade');
+            $table->string('report_name')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreateTasksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tasks');
+        Schema::dropIfExists('reports');
     }
 }

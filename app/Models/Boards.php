@@ -16,4 +16,8 @@ class Boards extends Model
     public function workspace(){
         return $this->belongsTo(Workspace::class,'workspace_id','id');
     }
+
+    public function tasks(){
+        return $this->belongsToMany(Task::class,'board_tasks','board_id','task_id');
+    }
 }

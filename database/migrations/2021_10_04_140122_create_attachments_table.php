@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTaskMembersTable extends Migration
+class CreateAttachmentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,10 @@ class CreateTaskMembersTable extends Migration
      */
     public function up()
     {
-        Schema::create('task_members', function (Blueprint $table) {
+        Schema::create('attachments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('task_id')->constrained('tasks')->onUpdate('cascade')->onDelete('cascade');
-            $table->unique(['user_id', 'task_id']);
-            $table->boolean('is_finishedby')->default(false);
+            $table->string('attachment_path');
             $table->timestamps();
         });
     }
@@ -30,6 +28,6 @@ class CreateTaskMembersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('task_members');
+        Schema::dropIfExists('attachments');
     }
 }
