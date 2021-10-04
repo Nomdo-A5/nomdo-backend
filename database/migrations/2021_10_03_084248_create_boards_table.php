@@ -13,14 +13,12 @@ class CreateBoardsTable extends Migration
      */
     public function up()
     {
-        Schema::enableForeignKeyConstraints();
         Schema::create('boards', function (Blueprint $table) {
             $table->id();
-            $table->string('boards_name');
+            $table->string('board_name');
+            $table->string('board_description');
             $table->foreignId('workspace_id')->constrained('workspaces')->onUpdate('cascade')->onDelete('cascade');
-             $table->timestamps();
-
-
+            $table->timestamps();
         });
     }
 

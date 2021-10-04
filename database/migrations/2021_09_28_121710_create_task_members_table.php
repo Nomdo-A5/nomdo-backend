@@ -17,6 +17,7 @@ class CreateTaskMembersTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('task_id')->constrained('tasks')->onUpdate('cascade')->onDelete('cascade');
+            $table->unique(['user_id', 'task_id']);
             $table->timestamps();
         });
     }

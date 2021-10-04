@@ -3,9 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
 use App\Http\Controllers\BoardsController;
-
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\TaskController;
 /*
@@ -24,9 +22,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('/boards',  [BoardsController::class,'index']);
     Route::post('/boards', [BoardsController::class,'store']);
-    Route::get('/boards', [WorkspaceController::class,'edit']);
-    Route::put('/boards',  [WorkspaceController::class,'update']);
-    Route::delete('/boards', [WorkspaceController::class,'delete']);
+    Route::get('/boards', [BoardsController::class,'edit']);
+    Route::put('/boards',  [BoardsController::class,'update']);
+    Route::delete('/boards', [BoardsController::class,'delete']);
 
     Route::post('/workspace', [WorkspaceController::class,'create']);
     Route::get('/workspace', [WorkspaceController::class,'show']);
@@ -37,6 +35,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/task', [TaskController::class, 'index']);
     Route::patch('/task',[TaskController::class, 'update']);
     Route::delete('/task',[TaskController::class, 'delete']);
+    
 });
 Route::post('/register', [AuthController::class,'register']);
 Route::post('/login', [AuthController::class,'login']);
