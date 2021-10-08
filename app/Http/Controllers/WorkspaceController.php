@@ -17,6 +17,7 @@ class WorkspaceController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
         if($request->id){
             $check = Workspace::firstWhere('id', $request->id);
             if(!$check)
@@ -46,7 +47,7 @@ class WorkspaceController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'workspace_name'=>'required',
+            'workspace_name'=> 'required',
         ]);
 
         $data = new Workspace([
@@ -57,22 +58,12 @@ class WorkspaceController extends Controller
 
         $workspace_id = $data->id;
         $user->workspaces()->attach($workspace_id);
-        
-        return response()->json([
-            'workspace' => $data,           
-            'message' => 'workspace created'
-        ], 200);
-    }
+        $user->workspaces()->updateExistingPivot($workspace_id,['is_owner' => true , 'is_admin' => true]);       
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        return response()->json([
+            'workspace' => $data,      
+            'message' => 'workspace created'
+        ], 201);
     }
 
     /**
@@ -86,24 +77,15 @@ class WorkspaceController extends Controller
     {
         //
         $user = Auth::user();
-        return response()->json([
-            'workspaces' => $user->workspaces,
-            'message' => "Workspace fetched"
-        ],200);
-        
+        if($request->id){
+            $workspace = $user->workspaces()->where('workspace_id' , $request->id)->first();
+            if(!$workspace){
+                return response()->json($workspace,404);
+            }
+            return response()->json($workspace,200);
+        }
+        return response()->json($user->workspaces,200);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Workspace  $workspace
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Workspace $workspace)
-    {
-        //
-    }
-
     /**
      * Update the specified resource in storage.
      *
@@ -113,40 +95,107 @@ class WorkspaceController extends Controller
      */
     public function update(Request $request)
     {
-        //
-        $workspace = Workspace::firstWhere('id', $request->id);
-        if($workspace == null){            
-            return response()->json([
-                'message' => 'Workspace unavailable'
-            ],404);
+        $user = Auth::user();
+        $is_updated = false;
+
+        //Validate request
+        $request->validate([
+            'id' => 'required',
+            'workspace_name' => 'string',
+            'member_id' => 'bigInt',
+        ]);
+        
+        //mengecek apakah workspace dengan ID tersebut adalah milik user yang sedang aktif  
+        $workspace = $user->workspaces()->where('workspace_id' , $request->id)->first();
+        if(!$workspace){            
+            return response()->json($workspace,404);
         }
 
-        //$workspace = Workspace::where('id', $request->id);
-        $workspace->workspace_name = $request->name;
-        $workspace->save();
+        //Checking the user access on that workspace
+        if($workspace->pivot->is_owner == true || $workspace->pivot->is_admin == true){
+            //Update name
+            if($request->workspace_name){
+                $this->updateName($workspace,$request->workspace_name);
+                $is_update = true;
+            }
+                       
+            //adding member
+            if($request->member_id){
+                $this->addMember($workspace, $request->member_id);
+                $is_update = true;
+            }
+            
+        }
+        else{
+            return response()->json([
+                'message' => "access denied",
+            ],405);
+        }
 
-        return response()->json([
-            'workspace' => $workspace,
-            'message' => 'Workspace updated'
-        ],200);
+        //jika terjadi perubahan
+        if($is_update){
+            return response()->json([
+                'workspace' => $workspace,
+                'message' => 'Workspace updated'
+            ],200);
+        }
+        else{
+            return response()->json($workspace,304);
+        }
         
+        
+    }
+    /**
+     * Updating workspace name
+     */
+    public function updateName(Workspace $workspace,String $name){
+        $workspace->workspace_name = $name;
+        $workspace->save();
+    }
+
+    /**
+     * Updating member of workspace
+     */
+    public function addMember(Workspace $workspace, BigInt $id){
+        $workspace->user()->attach($id);
     }
     /**
      * Delete the specific object
      */
     public function delete(Request $request){
-        $check = Workspace::firstWhere('id', $request->id);
-        if($check){
-            Workspace::destroy($request->id);
-            return response()->json([
-                'message' => 'Workspace deleted'
+        //check hak akses user terhadap worksapce tersebut 
+        $user = Auth::user();
+
+        $workspace = $user->workspaces()->where('workspace_id' , $request->id)->first();
+        if(!$workspace){            
+            return response()->json($workspace,404);
+        }
+
+        //checking user access permission
+        if($workspace->pivot->is_owner == true){
+            Workspace::destroy($workspace->id);
+            return response()->json([                
+                'message' => 'workspace deleted'
             ],200);
         }
         else{
             return response()->json([
-                'message' => 'failed to delete workspace'
-            ],404);
+                'message' => 'access denied'
+            ] ,405);
         }
+
+        // $check = Workspace::firstWhere('id', $request->id);
+        // if($check){
+        //     Workspace::destroy($request->id);
+        //     return response()->json([
+        //         'message' => 'Workspace deleted'
+        //     ],200);
+        // }
+        // else{
+        //     return response()->json([
+        //         'message' => 'failed to delete workspace'
+        //     ],404);
+        // }
     }
     /**
      * Remove the specified resource from storage.

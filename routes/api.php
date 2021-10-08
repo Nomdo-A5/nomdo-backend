@@ -22,7 +22,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('/boards',  [BoardsController::class,'index']);
     Route::post('/boards', [BoardsController::class,'store']);
-    Route::get('/boards', [BoardsController::class,'edit']);
+    //Route::get('/boards', [BoardsController::class,'edit']);
     Route::put('/boards',  [BoardsController::class,'update']);
     Route::delete('/boards', [BoardsController::class,'delete']);
 

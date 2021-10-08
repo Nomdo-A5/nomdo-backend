@@ -18,7 +18,7 @@ class CreateTaskMembersTable extends Migration
             $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('task_id')->constrained('tasks')->onUpdate('cascade')->onDelete('cascade');
             $table->unique(['user_id', 'task_id']);
-            $table->boolean('is_finishedby')->default(false);
+            $table->foreignId('is_finishedBy')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }

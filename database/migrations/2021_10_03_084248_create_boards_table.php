@@ -16,7 +16,7 @@ class CreateBoardsTable extends Migration
         Schema::create('boards', function (Blueprint $table) {
             $table->id();
             $table->string('board_name');
-            $table->string('board_description');
+            $table->string('board_description')->nullable();
             $table->foreignId('workspace_id')->constrained('workspaces')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
