@@ -42,7 +42,7 @@ class User extends Authenticatable
     ];
 
     public function workspaces(){
-        return $this->belongsToMany(Workspace::class,'workspace_members','user_id','workspace_id');
+        return $this->belongsToMany(Workspace::class,'workspace_members','user_id','workspace_id')->withPivot(['is_owner', 'is_admin']);
     }
 
     public function tasks(){
