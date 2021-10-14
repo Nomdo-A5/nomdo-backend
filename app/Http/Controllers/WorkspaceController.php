@@ -80,11 +80,16 @@ class WorkspaceController extends Controller
         if($request->id){
             $workspace = $user->workspaces()->where('workspace_id' , $request->id)->first();
             if(!$workspace){
-                return response()->json($workspace,404);
+                return response()->json([
+                    'workspace' => $workspace,
+                    'message' => 'workspace unavailable',
+                ],404);
             }
             return response()->json($workspace,200);
         }
-        return response()->json($user->workspaces,200);
+        return response()->json([
+            'workspace' => $user->workspaces()->get(), 
+        ],200);
     }
     /**
      * Update the specified resource in storage.

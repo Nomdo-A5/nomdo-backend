@@ -12,7 +12,7 @@ class Boards extends Model
 
     protected $fillable = [
         'board_name',
-        'boar_description',
+        'board_description',
         'workspace_id',
     ];
     public function workspace(){
