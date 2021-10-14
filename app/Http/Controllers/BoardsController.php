@@ -143,25 +143,29 @@ class BoardsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        $checkboards = Boards::find($id);
-        if(!$checkboards){
-
+        $board = Boards::find($request->id);
+        if(!$board){
             return response()->json([
-                'message' => 'Boards unavailable'
+                'message' => 'Boards unavailable',
             ],404);
         }
+       
+        $user = Auth::user();
+        $workspace = $board->workspace;
+        $member = $workspace->users()->where('user_id', $user->id)->first();
 
+        if(!$member || $member->pivot->is_owner == false || $member->pivot->is_admin == false){
+            return response()-json([
+                'message' => 'Access Denied'
+            ],405);
+        }
         $validator = Validator::make($request->all(), [
-            'boards_name' => 'required|unique:boards'
+            'board_name' => 'string',
+            'board_description' => 'string',
+        ]);
 
-        ],
-            [
-                'boards_name.required' => 'Masukkan Nama board !',
-
-            ]
-        );
         if($validator->fails()) {
 
             return response()->json([
@@ -170,23 +174,32 @@ class BoardsController extends Controller
                 'data'    => $validator->errors()
             ],400);
 
-        }else{
-            $updateboards = Boards::find($id);
-            $updateboards->nama_boards =  $request->get('nama_boards');
-            $updateboards->save();
-        if($updateboards){
+        }
+
+        $message = "";
+        if(!$request->board_name){
+            $board->board_name =  $request->board_name;
+            $message = "Board name updated";
+        }
+        if(!$request->board_description){
+            $boards->board_description = $request->board_description;
+            $message += "Board description updated";
+        }
+        
+        $board->save();
+            
+            
+        if($board){
             return response()->json([
                 'success' => true,
-                'message' => 'Boards updated!',
+                'message' => $message,
             ], 200);
         }else{
             return response()->json([
                 'success' => false,
                 'message' => 'Failed boards updated!',
             ], 400);
-        }
-
-        }
+        }        
     }
 
     /**
@@ -195,12 +208,29 @@ class BoardsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $deleteboards = Boards::findOrFail($id);
-        $deleteboards->delete();
+        //$deleteboards = Boards::findOrFail($request->id);
+        $board = Boards::findOrFail($request->id);
+        if(!$board){
+            return response()->json([
+                'message' => 'Boards unavailable',
+            ],404);
+        }
+       
+        $user = Auth::user();
+        $workspace = $board->workspace;
+        $member = $workspace->users()->where('user_id', $user->id)->first();
 
-        if ($deleteboards) {
+        if(!$member || $member->pivot->is_owner == false || $member->pivot->is_admin == false){
+            return response()-json([
+                'message' => 'Access Denied'
+            ],405);
+        }
+
+        $board->delete();
+
+        if ($board) {
             return response()->json([
                 'success' => true,
                 'message' => 'boards deleted',
@@ -217,9 +247,21 @@ class BoardsController extends Controller
     /**
      * Checking access user of constrained workspaces
      */
+    public function userAccess($id)
+    {
+        $user = Auth::user();
+        $board = Board::findOrFail($id);
 
-    public function userAccess(BigInt $id){
-        
+        $workspace = $board->workspace();
+        $workspace = $user->workspaces()->where('workspace_id' , $workspace->id)->first();
+
+        if(!$workspace){
+            return response()->json([
+                'message' => 'access denied'
+            ], 405);
+        }
+
+        return $workspace;
     }
 
 }

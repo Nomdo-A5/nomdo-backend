@@ -22,9 +22,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('/boards',  [BoardsController::class,'index']);
     Route::post('/boards', [BoardsController::class,'store']);
-    //Route::get('/boards', [BoardsController::class,'edit']);
-    Route::put('/boards',  [BoardsController::class,'update']);
-    Route::delete('/boards', [BoardsController::class,'delete']);
+    Route::patch('/boards',  [BoardsController::class,'update']);
+    Route::delete('/boards', [BoardsController::class,'destroy']);
 
     Route::post('/workspace', [WorkspaceController::class,'create']);
     Route::get('/workspace', [WorkspaceController::class,'show']);
@@ -37,5 +36,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::delete('/task',[TaskController::class, 'delete']);
     
 });
+//Route::get('/workspace', [WorkspaceController::class,'show']);
+Route::get('/task', [TaskController::class, 'index']);
 Route::post('/register', [AuthController::class,'register']);
 Route::post('/login', [AuthController::class,'login']);
