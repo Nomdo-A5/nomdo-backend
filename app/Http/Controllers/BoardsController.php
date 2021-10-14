@@ -106,7 +106,7 @@ class BoardsController extends Controller
         if($workspace->pivot->is_owner == true || $workspace->pivot->is_admin == true){
             $new = new Boards([
                 'board_name' => $request->board_name,
-                'board_description' => $request->board_description,
+                //'board_description' => $request->board_description,
                 'workspace_id' => $request->workspace_id,
             ]);
 
@@ -211,7 +211,7 @@ class BoardsController extends Controller
     public function destroy(Request $request)
     {
         //$deleteboards = Boards::findOrFail($request->id);
-        $board = Boards::findOrFail($request->id);
+        $board = Boards::find($request->id);
         if(!$board){
             return response()->json([
                 'message' => 'Boards unavailable',
