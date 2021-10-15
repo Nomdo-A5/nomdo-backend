@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class TaskController extends Controller
 {
+    
     /**
      * Display a listing of the resource.
      *
@@ -19,22 +20,48 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
+
+        if($request->board_id){
+            //check if board is available 
+            $board = Boards::find($request->board_id);
+            if(!$board){
+                return response()->json([
+                    'message' => 'Board unavailable',
+                    'board' => $board,
+                ],404);
+            }
+
+            $this->userAccess($board);
+
+            return response()->json([
+                'task'    =>  $board->tasks
+            ],200);
+        }
+
         if($request->id){
             $task = Task::firstWhere('id', $request->id);
-            if($task){
-                return response()->json([
-                    'task' => $task,
-                ],200);
-            }
-            else{
+            if(!$task){
                 return response()->json([
                     'task' =>$task,
                     'message' => 'task unavalable',
                 ],404);
             }
+
+            $is_member = $task->users()->where('user_id', $user->id)->first();
+            if(!$is_member){
+                return response()->json([
+                    'task' => $task,
+                    'message' => 'Access denied'
+                ],405);
+            }
+
+            return response()->json([
+                'task' => $task,
+            ],200);
         }
         //showing all task for every user
-        return response()->json(Task::all(),200);
+        return response()->json($user->tasks,200);
     }
 
     /**
@@ -65,10 +92,6 @@ class TaskController extends Controller
             ],400);
         }
 
-        /**
-         * check user access with existing board in a workspace
-         */
-
         //check if board is available 
         $board = Boards::find($request->board_id);
         if(!$board){
@@ -78,20 +101,10 @@ class TaskController extends Controller
             ],404);
         }
 
-        //check user connection with board founded
+        //check user access with board founded
+        $this->userAccess($board);      
         $user = Auth::user();
-        $workspace = $board->workspace;
-        $member = $workspace->users()->where('user_id', $user->id)->first();
-
-        if(!$member){
-            return response()->json([
-                'message' => 'Access denied'
-            ],403);
-        }
-
-        /**
-         * Finish checking user accces to board, then create task 
-         */
+        
         $task = new Task([
             'task_name' => $request->task_name,
             'task_description' => $request->task_desription,
@@ -99,6 +112,7 @@ class TaskController extends Controller
         ]);
 
         $task->save();
+        $board->tasks()->attach($task->id);
         $user->tasks()->attach($task->id);
         
         return response()->json([
@@ -106,40 +120,7 @@ class TaskController extends Controller
             //'member' => $data->users,           
         ], 200);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
+   
     /**
      * Update the specified resource in storage.
      *
@@ -208,5 +189,20 @@ class TaskController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * Checking user access to existing board
+     */
+    public function userAccess(Boards $board){
+        $user = Auth::user();
+        $workspace = $board->workspace;
+        $member = $workspace->users()->where('user_id', $user->id)->get();
+
+        if(!$member){
+            return response()->json([
+                'message' => 'Access denied'
+            ],403);
+        }
     }
 }

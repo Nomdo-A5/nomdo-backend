@@ -37,6 +37,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     
 });
 //Route::get('/workspace', [WorkspaceController::class,'show']);
-Route::get('/task', [TaskController::class, 'index']);
+// Route::get('/task', [TaskController::class, 'index']);
 Route::post('/register', [AuthController::class,'register']);
 Route::post('/login', [AuthController::class,'login']);
