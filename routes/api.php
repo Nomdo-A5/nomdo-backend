@@ -19,6 +19,7 @@ use App\Http\Controllers\TaskController;
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/logout', [AuthController::class,'logout']);
+    Route::get('/user', [AuthController::class,'getActiveUser']);
 
     Route::get('/boards',  [BoardsController::class,'index']);
     Route::post('/boards', [BoardsController::class,'store']);
@@ -37,6 +38,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     
 });
 //Route::get('/workspace', [WorkspaceController::class,'show']);
-Route::get('/task', [TaskController::class, 'index']);
+// Route::get('/task', [TaskController::class, 'index']);
 Route::post('/register', [AuthController::class,'register']);
 Route::post('/login', [AuthController::class,'login']);
