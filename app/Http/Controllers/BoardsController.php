@@ -23,28 +23,27 @@ class BoardsController extends Controller
         $user = Auth::user();
 
         //Find user relation with requested workspace
-        $workspace = $user->workspaces()->where('workspace_id' , $request->workspace_id)->first();
-        if(!$workspace){
+        if($request->workspace_id){
+            $workspace = $user->workspaces()->where('workspace_id' , $request->workspace_id)->first();
+            if(!$workspace){
             return response()->json([
                 'workspace' => $workspace,
                 'message'   => 'workspace unavailable'
             ],404);
+            }
         }
 
         //if user have relation with requested workspace then fetch all boards
-        if(!$request->id)
-            $boards = DB::table('boards')
-                        ->where('workspace_id', $request->workspace_id)->get();        
-        else{
-            $boards = DB::table('boards')
-                ->where([
-                    ['workspace_id', $request->workspace_id],
-                        ['id', $request->id],
-                    ])->get();        
-        
+        if(!$request->id){
+            return response()->json([
+                'board' => $workspace->boards
+            ],200);
+        }
+        else{ 
+            $boards = $workspace->boards()->where('id', $request->id)->first();              
         }
     
-        if($boards->isEmpty()){
+        if(!$boards){
             return response()->json([
                 'boards' => $boards,
                 'message' => 'Boards unavailable'
@@ -67,6 +66,7 @@ class BoardsController extends Controller
     {
         $validator = Validator::make($request->all(),[
             'board_name' => 'required|unique:boards',
+            'board_description' => 'string',
             'workspace_id' => 'required'
         ],
         [
@@ -106,7 +106,7 @@ class BoardsController extends Controller
         if($workspace->pivot->is_owner == true || $workspace->pivot->is_admin == true){
             $new = new Boards([
                 'board_name' => $request->board_name,
-                //'board_description' => $request->board_description,
+                'board_description' => $request->board_description,
                 'workspace_id' => $request->workspace_id,
             ]);
 
@@ -123,17 +123,6 @@ class BoardsController extends Controller
                 ], 400);
             }
         }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
@@ -167,7 +156,6 @@ class BoardsController extends Controller
         ]);
 
         if($validator->fails()) {
-
             return response()->json([
                 'success' => false,
                 'message' => 'Silahkan Isi Board Yang Kosong',
@@ -177,13 +165,13 @@ class BoardsController extends Controller
         }
 
         $message = "";
-        if(!$request->board_name){
+        if($request->board_name){
             $board->board_name =  $request->board_name;
             $message = "Board name updated";
         }
-        if(!$request->board_description){
-            $boards->board_description = $request->board_description;
-            $message += "Board description updated";
+        if($request->board_description){
+            $board->board_description = $request->board_description;
+            $message .= " Board description updated";
         }
         
         $board->save();

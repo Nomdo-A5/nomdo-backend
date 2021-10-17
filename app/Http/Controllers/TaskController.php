@@ -76,7 +76,7 @@ class TaskController extends Controller
         $validator = Validator::make($request->all(),[
             'task_name' => 'required',
             'task_description' => 'string',
-            'due_date' => 'date',
+            'due_date' => 'date|date_format:Y-m-d',
             'board_id' => 'required'
         ],
         [
@@ -107,7 +107,7 @@ class TaskController extends Controller
         
         $task = new Task([
             'task_name' => $request->task_name,
-            'task_description' => $request->task_desription,
+            'task_description' => $request->task_description,
             'due_date' => $request->due_date,
         ]);
 
@@ -131,6 +131,7 @@ class TaskController extends Controller
     public function update(Request $request)
     {
         //
+        $user = Auth::user();
         $task = Task::firstWhere('id', $request->id);
         
         if($task == null){
@@ -138,6 +139,22 @@ class TaskController extends Controller
                 'task' => $task,
                 'message' => 'Task unavailable'
             ],404);
+        }
+
+        if($request->task_name)
+            $task->task_name = $request->task_name;
+        if($request->task_description)
+            $task->task_description = $request->task_description;
+        if($request->status)
+            $task->status = $request->status;
+        if($request->member_id){
+            $user = User::firstWhere('id', $request->member_id);
+            
+            $user->tasks()->attach($task->id);
+            return response()->json([
+                'task' => $task,
+                'message' => 'Task member update'
+            ],200);
         }
 
         if($request->member_id){
@@ -150,13 +167,6 @@ class TaskController extends Controller
             ],200);
         }
 
-        if($request->task_name)
-            $task->task_name = $request->task_name;
-        if($request->task_description)
-            $task->task_description = $request->task_description;
-        if($request->status)
-            $task->status = $request->status;
-        
         $task->save();
         return response()->json([
             'task' => $task,
