@@ -47,7 +47,7 @@ class TaskController extends Controller
                     'message' => 'task unavalable',
                 ],404);
             }
-
+            
             $is_member = $task->users()->where('user_id', $user->id)->first();
             if(!$is_member){
                 return response()->json([
@@ -61,7 +61,9 @@ class TaskController extends Controller
             ],200);
         }
         //showing all task for every user
-        return response()->json($user->tasks,200);
+        return response()->json([
+            'task' => $user->tasks
+        ],200);
     }
 
     /**
