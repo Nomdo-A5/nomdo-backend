@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class TaskController extends Controller
 {
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -23,7 +23,7 @@ class TaskController extends Controller
         $user = Auth::user();
 
         if($request->board_id){
-            //check if board is available 
+            //check if board is available
             $board = Boards::find($request->board_id);
             if(!$board){
                 return response()->json([
@@ -47,7 +47,7 @@ class TaskController extends Controller
                     'message' => 'task unavalable',
                 ],404);
             }
-            
+
             $is_member = $task->users()->where('user_id', $user->id)->first();
             if(!$is_member){
                 return response()->json([
@@ -94,7 +94,7 @@ class TaskController extends Controller
             ],400);
         }
 
-        //check if board is available 
+        //check if board is available
         $board = Boards::find($request->board_id);
         if(!$board){
             return response()->json([
@@ -104,9 +104,9 @@ class TaskController extends Controller
         }
 
         //check user access with board founded
-        $this->userAccess($board);      
+        $this->userAccess($board);
         $user = Auth::user();
-        
+
         $task = new Task([
             'task_name' => $request->task_name,
             'task_description' => $request->task_description,
@@ -116,13 +116,13 @@ class TaskController extends Controller
         $task->save();
         $board->tasks()->attach($task->id);
         $user->tasks()->attach($task->id);
-        
+
         return response()->json([
             'task' => $task,
-            //'member' => $data->users,           
+            //'member' => $data->users,
         ], 200);
     }
-   
+
     /**
      * Update the specified resource in storage.
      *
@@ -135,7 +135,7 @@ class TaskController extends Controller
         //
         $user = Auth::user();
         $task = Task::firstWhere('id', $request->id);
-        
+
         if($task == null){
             return response()->json([
                 'task' => $task,
@@ -151,7 +151,7 @@ class TaskController extends Controller
             $task->status = $request->status;
         if($request->member_id){
             $user = User::firstWhere('id', $request->member_id);
-            
+
             $user->tasks()->attach($task->id);
             return response()->json([
                 'task' => $task,
@@ -161,7 +161,7 @@ class TaskController extends Controller
 
         if($request->member_id){
             $user = User::firstWhere('id', $request->member_id);
-            
+
             $user->tasks()->attach($task->id);
             return response()->json([
                 'task' => $task,
