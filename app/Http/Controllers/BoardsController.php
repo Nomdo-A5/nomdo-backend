@@ -39,10 +39,10 @@ class BoardsController extends Controller
                 'board' => $workspace->boards
             ],200);
         }
-        else{ 
-            $boards = $workspace->boards()->where('id', $request->id)->first();              
+        else{
+            $boards = $workspace->boards()->where('id', $request->id)->first();
         }
-    
+
         if(!$boards){
             return response()->json([
                 'boards' => $boards,
@@ -52,7 +52,7 @@ class BoardsController extends Controller
         return response()->json([
             'boards' => $boards
         ], 200);
-        
+
     }
 
 
@@ -81,10 +81,10 @@ class BoardsController extends Controller
                 'data'    => $validator->errors()
             ],400);
         }
-         
-        //Checking if the workspaces is exist         
+
+        //Checking if the workspaces is exist
         $workspace = DB::table('workspaces')->where('id', $request->workspace_id)->first();
-        
+
         if($workspace == null){
             return response()->json([
                 'workspace' => $workspace,
@@ -140,7 +140,7 @@ class BoardsController extends Controller
                 'message' => 'Boards unavailable',
             ],404);
         }
-       
+
         $user = Auth::user();
         $workspace = $board->workspace;
         $member = $workspace->users()->where('user_id', $user->id)->first();
@@ -173,10 +173,10 @@ class BoardsController extends Controller
             $board->board_description = $request->board_description;
             $message .= " Board description updated";
         }
-        
+
         $board->save();
-            
-            
+
+
         if($board){
             return response()->json([
                 'success' => true,
@@ -186,8 +186,8 @@ class BoardsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed boards updated!',
-            ], 400);
-        }        
+            ], 400); 
+        }
     }
 
     /**
@@ -205,7 +205,7 @@ class BoardsController extends Controller
                 'message' => 'Boards unavailable',
             ],404);
         }
-       
+
         $user = Auth::user();
         $workspace = $board->workspace;
         $member = $workspace->users()->where('user_id', $user->id)->first();
