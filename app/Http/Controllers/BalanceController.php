@@ -68,6 +68,7 @@ class BalanceController extends Controller
                 'report' => $report,
             ],404);
         }
+
         $user = Auth::user();
 
         $balance = new Balance([
@@ -127,3 +128,16 @@ class BalanceController extends Controller
         }
     }
 }
+  public function userAccess(Boards $board){
+            $user = Auth::user();
+            $workspace = $board->workspace;
+            $member = $workspace->users()->where('user_id', $user->id)->get();
+
+            if(!$member){
+                return response()->json([
+                    'message' => 'Access denied'
+                ],403);
+            }
+        }
+    }
+
