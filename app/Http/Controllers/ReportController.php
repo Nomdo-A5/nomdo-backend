@@ -15,8 +15,7 @@ class ReportController extends Controller
         ->where('users.id', '=', $id)
         ->get();
 
-    return response()->json($report, 200);
-
+      return response()->json($report, 200);
 
     }
 }

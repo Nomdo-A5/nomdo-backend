@@ -15,7 +15,7 @@ class Report extends Model
     public function workspace(){
         return $this->belongsTo(workspace::class, 'workspace_id', 'id');
     }
-    public function balance(){
+    public function balances(){
         return $this->hasMany(Balance::class, 'balance_id', 'id');
     }
 }
