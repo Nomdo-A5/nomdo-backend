@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use App\Http\Controllers\ReportController;
 
 class WorkspaceController extends Controller
 {
@@ -59,6 +60,9 @@ class WorkspaceController extends Controller
         $workspace_id = $data->id;
         $user->workspaces()->attach($workspace_id);
         $user->workspaces()->updateExistingPivot($workspace_id,['is_owner' => true , 'is_admin' => true]);       
+        $report_controller = new ReportController;
+        $report_controller->create($workspace_id);
+
 
         return response()->json([
             'workspace' => $data,      

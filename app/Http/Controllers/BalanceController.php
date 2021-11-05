@@ -42,12 +42,13 @@ class BalanceController extends Controller
             }
         }
     }
+
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(),[
-
             'nominal' => 'required|integer',
             'is_income' => 'required|boolean',
+            'report_id' => 'required',
         ],
         [
             'nominal.required' => 'Input nominal balance!',
@@ -61,6 +62,8 @@ class BalanceController extends Controller
                 'data'    => $validator->errors()
             ],400);
         }
+
+        //check apakah report tersebut ada
         $report = Report::find($request->report_id);
         if(!$report){
             return response()->json([
@@ -69,6 +72,7 @@ class BalanceController extends Controller
             ],404);
         }
 
+        //cek user access kedalam report tersebut 
         $user = Auth::user();
 
         $balance = new Balance([
@@ -90,6 +94,7 @@ class BalanceController extends Controller
             ], 400);
         }
     }
+
     public function update(Request $request)
     {
             //
@@ -127,17 +132,17 @@ class BalanceController extends Controller
             ],404);
         }
     }
-}
-  public function userAccess(Boards $board){
-            $user = Auth::user();
-            $workspace = $board->workspace;
-            $member = $workspace->users()->where('user_id', $user->id)->get();
+    public function userAccess(Boards $board){
+        $user = Auth::user();
+        $workspace = $board->workspace;
+        $member = $workspace->users()->where('user_id', $user->id)->get();
 
-            if(!$member){
-                return response()->json([
-                    'message' => 'Access denied'
-                ],403);
-            }
+        if(!$member){
+            return response()->json([
+                'message' => 'Access denied'
+            ],403);
         }
     }
 
+}
+  
