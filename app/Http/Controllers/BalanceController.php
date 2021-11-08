@@ -52,6 +52,7 @@ class BalanceController extends Controller
         ],
         [
             'nominal.required' => 'Input nominal balance!',
+            'is_income.required' => 'Income status is needed',
             'report_id.required' => 'report is needed'
         ]);
 
