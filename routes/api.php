@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoardsController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\BalanceController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -45,6 +46,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('/report', [ReportController::class,'index']);
     Route::post('/report', [ReportController::class,'create']);
+
+    Route::post('/balance', [BalanceController::class,'create']);
 
 });
 //Route::get('/workspace', [WorkspaceController::class,'show']);

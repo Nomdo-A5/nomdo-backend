@@ -5,6 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Balance;
 use App\Models\Report;
+use App\Models\Workspace;
+
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BalanceController extends Controller
 {
@@ -45,15 +51,16 @@ class BalanceController extends Controller
 
     public function create(Request $request)
     {
+        
         $validator = Validator::make($request->all(),[
-            'nominal' => 'required|integer',
-            'is_income' => 'required|boolean',
-            'report_id' => 'required',
+            'nominal' => 'required',
+            'is_income' => 'required',
+            'workspace_id' => 'required'
         ],
         [
             'nominal.required' => 'Input nominal balance!',
             'is_income.required' => 'Income status is needed',
-            'report_id.required' => 'report is needed'
+            'workspace_id.required' => 'workspace is needed'
         ]);
 
         if($validator->fails()){
@@ -64,18 +71,32 @@ class BalanceController extends Controller
             ],400);
         }
 
-        //check apakah report tersebut ada
-        $report = Report::find($request->report_id);
+        //cek apakah workspace tersebut ada
+        $workspace = Workspace::firstWhere('id', $request->workspace_id);
+        if(!$workspace){
+            return response()->json([
+                'message' => 'Workspace unavailable'
+            ],404);
+        }
+
+        //cek apakah user tersebut adalah anggota workspace
+        $user = Auth::user();
+        $member = $workspace->users()->where('user_id', $user->id)->get();
+        if(!$member){
+            return response()->json([
+                'message' => 'Acces denied'
+            ],403);
+        }
+
+        //cari report yang berkaitan dengan workspace tersebut
+        $report = Report::firstWhere('workspace_id', $workspace->id);
         if(!$report){
             return response()->json([
                 'message' => 'Report unavailable',
                 'report' => $report,
             ],404);
         }
-
-        //cek user access kedalam report tersebut 
-        $user = Auth::user();
-
+        
         $balance = new Balance([
             'balance_description' => $request->balance_description,
             'nominal' => $request->nominal,
@@ -83,6 +104,8 @@ class BalanceController extends Controller
         ]);
 
         $balance->save();
+        $report->balances()->attach($balance->id);
+
         if ($balance) {
             return response()->json([
                 'message' => 'Balance created',
