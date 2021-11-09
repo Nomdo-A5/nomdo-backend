@@ -147,11 +147,17 @@ class TaskController extends Controller
             $task->task_name = $request->task_name;
         if($request->task_description)
             $task->task_description = $request->task_description;
-        if($request->status)
-            $task->status = $request->status;
+        if($request->due_date)
+            $task->due_date = $request->due_date;
+        if($request->is_done)
+            $task->is_done = $request->is_done;
         if($request->member_id){
             $user = User::firstWhere('id', $request->member_id);
-
+            if(!$user){
+                return response()->json([
+                    'message' => 'User unavailable'
+                ],403);
+            }
             $user->tasks()->attach($task->id);
             return response()->json([
                 'task' => $task,
@@ -159,15 +165,6 @@ class TaskController extends Controller
             ],200);
         }
 
-        if($request->member_id){
-            $user = User::firstWhere('id', $request->member_id);
-
-            $user->tasks()->attach($task->id);
-            return response()->json([
-                'task' => $task,
-                'message' => 'Task member update'
-            ],200);
-        }
 
         $task->save();
         return response()->json([

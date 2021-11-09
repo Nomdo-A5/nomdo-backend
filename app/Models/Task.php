@@ -11,7 +11,9 @@ class Task extends Model
     protected $fillable = [
         'task_name',
         'task_description',
-        'status'
+        'due_date',
+        'is_done',
+        'is_finishedBy'
     ];
 
     public function users(){
