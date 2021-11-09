@@ -43,7 +43,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/balance', [BalanceController::class,'update']);
     Route::delete('/balance', [BalanceController::class,'delete']);
 
-    Route::post('/report', [ReportController::class,'index']);
+    Route::get('/report', [ReportController::class,'index']);
     Route::post('/report', [ReportController::class,'create']);
 
 });
