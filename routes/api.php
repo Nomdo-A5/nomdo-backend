@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoardsController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BalanceController;
 /*
 |--------------------------------------------------------------------------
@@ -44,7 +45,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/balance', [BalanceController::class,'update']);
     Route::delete('/balance', [BalanceController::class,'delete']);
 
-    Route::get('/report', [ReportController::class,'index']);
+    Route::get('/report', [ReportController::class,'select']);
     Route::post('/report', [ReportController::class,'create']);
 
     Route::post('/balance', [BalanceController::class,'create']);
