@@ -7,21 +7,13 @@ use App\Models\Balance;
 use App\Models\Workspace;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    public function index(){
-        $report = DB::table('users')
-        ->leftJoin('workspace', 'users.id', '=', 'workspace.id')
-        ->leftJoin('task', 'users.id', '=', 'task.id')
-        ->leftJoin('balance', 'users.id', '=', 'balance.id')
-       ->select('workspace.nama','task.nama','balance.incomme','tbalance.outcome')
-        ->where('users.id', '=', $id)
-        ->get();
-
-      return response()->json($report, 200);
-    }
 
   public function create(int $workspace_id){
     //mengambil user yang sedang aktif
@@ -48,8 +40,46 @@ class ReportController extends Controller
     $report->save();
   }
 
-  public function userAccess(User $user, Workspace $workspace){
-    
+  public function select(Request $request){
+    $validator = Validator::make($request->all(),[
+      'workspace_id' => 'required'
+    ],[
+      'workspace_id.required' => 'Workspace id is needed'
+    ]);
+
+    if($validator->fails()){
+      return response()->json([
+        'message' => 'Please check your input'
+      ],400);
+    }
+
+    //cek apakah workspace tersebut ada 
+    $workspace = Workspace::firstWhere('id', $request->workspace_id);
+    if(!$workspace){
+      return response()->json([
+        'message' => 'Workspace unavailable'
+      ],404);
+    }
+
+    $user = Auth::user();
+    $this->userAccess($user,$workspace);
+
+    //cek report pada workspace tersebut
+    $report = Report::firstWhere('workspace_id', $workspace->id);
+    if(!$report){
+      return response()->json([
+        'message' => 'Report unavailable'
+      ],404);
+    }
+
+    //select seluruh balance dalam satu report
+    $balance = $report->balances()->get();
+    return response()->json([
+      'balance' => $balance,
+      'message' => 'Balance fetched'
+    ],200);
+  }
+  public function userAccess(User $user, Workspace $workspace){    
     if(!($user->workspaces()->where('workspace-id', $workspace->id)))
         return response()->json([
           'message' => 'Access denied'
