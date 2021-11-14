@@ -123,6 +123,9 @@ class BoardsController extends Controller
                 ], 400);
             }
         }
+        return response()->json([
+            'message' => "Acces denied"
+        ],403);
     }
 
     /**
@@ -186,7 +189,7 @@ class BoardsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed boards updated!',
-            ], 400); 
+            ], 400);
         }
     }
 

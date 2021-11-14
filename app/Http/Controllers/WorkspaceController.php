@@ -27,13 +27,13 @@ class WorkspaceController extends Controller
                 ],404);
 
             $workspace = Workspace::find($request->id);
-            
+
             return response()->json([
                 'workspace' => $workspace,
                 'message' => 'Workspace fetched'
             ],200);
         }
-        //get all data whoever the user 
+        //get all data whoever the user
         return response()->json(Workspace::all(), 200);
     }
 
@@ -52,20 +52,21 @@ class WorkspaceController extends Controller
         ]);
 
         $data = new Workspace([
-            'workspace_name' => $request->get('workspace_name')
+            'workspace_name' => $request->get('workspace_name'),
+            'url_join' => $this->unique_code(16),
         ]);
 
         $data->save();
 
         $workspace_id = $data->id;
         $user->workspaces()->attach($workspace_id);
-        $user->workspaces()->updateExistingPivot($workspace_id,['is_owner' => true , 'is_admin' => true]);       
+        $user->workspaces()->updateExistingPivot($workspace_id,['is_owner' => true , 'is_admin' => true]);
         $report_controller = new ReportController;
         $report_controller->create($workspace_id);
 
 
         return response()->json([
-            'workspace' => $data,      
+            'workspace' => $data,
             'message' => 'workspace created'
         ], 201);
     }
@@ -92,7 +93,7 @@ class WorkspaceController extends Controller
             return response()->json($workspace,200);
         }
         return response()->json([
-            'workspace' => $user->workspaces()->get(), 
+            'workspace' => $user->workspaces()->get(),
         ],200);
     }
     /**
@@ -113,10 +114,10 @@ class WorkspaceController extends Controller
             'workspace_name' => 'string',
             'member_id' => 'bigInt',
         ]);
-        
-        //mengecek apakah workspace dengan ID tersebut adalah milik user yang sedang aktif  
+
+        //mengecek apakah workspace dengan ID tersebut adalah milik user yang sedang aktif
         $workspace = $user->workspaces()->where('workspace_id' , $request->id)->first();
-        if(!$workspace){            
+        if(!$workspace){
             return response()->json($workspace,404);
         }
 
@@ -127,13 +128,13 @@ class WorkspaceController extends Controller
                 $this->updateName($workspace,$request->workspace_name);
                 $is_update = true;
             }
-                       
+
             //adding member
             if($request->member_id){
                 $this->addMember($workspace, $request->member_id);
                 $is_update = true;
             }
-            
+
         }
         else{
             return response()->json([
@@ -151,8 +152,8 @@ class WorkspaceController extends Controller
         else{
             return response()->json($workspace,304);
         }
-        
-        
+
+
     }
     /**
      * Updating workspace name
@@ -165,25 +166,25 @@ class WorkspaceController extends Controller
     /**
      * Updating member of workspace
      */
-    public function addMember(Workspace $workspace, BigInt $id){
-        $workspace->user()->attach($id);
+    public function addMember(Workspace $workspace, int $id){
+        $workspace->users()->attach($id);
     }
     /**
      * Delete the specific object
      */
     public function delete(Request $request){
-        //check hak akses user terhadap worksapce tersebut 
+        //check hak akses user terhadap worksapce tersebut
         $user = Auth::user();
 
         $workspace = $user->workspaces()->where('workspace_id' , $request->id)->first();
-        if(!$workspace){            
+        if(!$workspace){
             return response()->json($workspace,404);
         }
 
         //checking user access permission
         if($workspace->pivot->is_owner == true){
             Workspace::destroy($workspace->id);
-            return response()->json([                
+            return response()->json([
                 'message' => 'workspace deleted'
             ],200);
         }
@@ -215,5 +216,45 @@ class WorkspaceController extends Controller
     public function destroy(Workspace $workspace)
     {
         //
+    }
+
+    // Return unique token for url_join
+    public function unique_code($limit){
+        $token = substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, $limit);
+        $check = Workspace::firstWhere('url_join', $token);
+
+        while($check){
+            $token = substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, $limit);
+            $check = Workspace::firstWhere('url_join', $token);
+        }
+
+        return $token;
+    }
+
+
+    public function join(Request $request){
+        $user = Auth::user();
+        $is_update = false;
+
+        $request->validate([
+            'url_join' => 'required',
+            'member_id' => 'required'
+         ]);
+
+         $workspace = Workspace::firstWhere('url_join', $request->url_join);
+         if($workspace){
+            $this->addMember($workspace,$request->member_id);
+            $is_update = true;
+         }
+
+         if($is_update){
+            return response()->json([
+                'workspace' => $workspace,
+                'message' => 'Workspace joined'
+            ],200);
+        }
+        else{
+            return response()->json($workspace,404);
+        }
     }
 }

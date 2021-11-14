@@ -51,7 +51,7 @@ class BalanceController extends Controller
 
     public function create(Request $request)
     {
-        
+
         $validator = Validator::make($request->all(),[
             'nominal' => 'required',
             'is_income' => 'required',
@@ -96,7 +96,7 @@ class BalanceController extends Controller
                 'report' => $report,
             ],404);
         }
-        
+
         $balance = new Balance([
             'balance_description' => $request->balance_description,
             'nominal' => $request->nominal,
@@ -169,4 +169,3 @@ class BalanceController extends Controller
     }
 
 }
-  
