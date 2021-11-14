@@ -50,6 +50,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('/balance', [BalanceController::class,'create']);
 
+    Route::post('/attacment/{id}', [AttachmentController::class,'create']);
+
 });
 //Route::get('/workspace', [WorkspaceController::class,'show']);
 // Route::get('/task', [TaskController::class, 'index']);
