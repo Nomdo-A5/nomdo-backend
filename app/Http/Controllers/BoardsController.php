@@ -33,24 +33,20 @@ class BoardsController extends Controller
             }
         }
 
+        $boards = $workspace->boards()->get();
         //if user have relation with requested workspace then fetch all boards
-        if(!$request->id){
-            return response()->json([
-                'board' => $workspace->boards
-            ],200);
-        }
-        else{
+        if($request->id){
             $boards = $workspace->boards()->where('id', $request->id)->first();
         }
 
-        if(!$boards){
+        if(count($boards) == 0){
             return response()->json([
-                'boards' => $boards,
                 'message' => 'Boards unavailable'
             ],404);
         }
         return response()->json([
-            'boards' => $boards
+            'boards' => $boards,
+            'message' => 'boards fetched'
         ], 200);
 
     }
