@@ -18,7 +18,7 @@ class CreateTasksTable extends Migration
             $table->string('task_name');
             $table->string('task_description')->nullable();
             $table->timestamp('due_date')->nullable();
-            $table->integer('is_done')->default(0);
+            $table->boolean('is_done')->default(0);
             $table->bigInteger('is_finishedBy')->default(0);
             $table->timestamps();
         });
