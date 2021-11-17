@@ -10,6 +10,7 @@ class Workspace extends Model
     use HasFactory;
     protected $fillable = [
         'workspace_name',
+        'workspace_description',
         'url_join'
     ];
 

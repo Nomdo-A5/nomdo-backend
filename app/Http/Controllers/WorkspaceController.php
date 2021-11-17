@@ -49,10 +49,12 @@ class WorkspaceController extends Controller
 
         $request->validate([
             'workspace_name'=> 'required',
+            'workspace_description' => 'required',
         ]);
 
         $data = new Workspace([
             'workspace_name' => $request->get('workspace_name'),
+            'workspace_description' => $request->get('workspace_description'),
             'url_join' => $this->unique_code(16),
         ]);
 

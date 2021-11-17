@@ -149,8 +149,8 @@ class TaskController extends Controller
             $task->task_description = $request->task_description;
         if($request->due_date)
             $task->due_date = $request->due_date;
-        if($request->is_done)
-            $task->is_done = $request->is_done;
+        $task->is_done = $request->is_done;
+
         if($request->member_id){
             $user = User::firstWhere('id', $request->member_id);
             if(!$user){
