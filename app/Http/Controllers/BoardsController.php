@@ -251,4 +251,14 @@ class BoardsController extends Controller
         return $workspace;
     }
 
+    public function taskCount(Boards $board){
+        $tasks = $board->task()->get();
+        $done_task = $task->where('is_done',1)->get();
+
+        $done_task = $done_task->count();
+        $task = $task->count();
+
+        return [$task,$done_task];
+    }
+
 }
