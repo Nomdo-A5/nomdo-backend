@@ -253,19 +253,17 @@ class BoardsController extends Controller
 
     public function taskCount(Request $request){
         $board = $this->getBoard($request->board_id);
+        
         $tasks = $board->tasks()->get();
-        if(count($tasks) == 0){
+        if(count($tasks)==0){
             return response()->json([
                 'message' => 'task empty'
             ],404);
         }
-        $done_task = $tasks->where('is_done',1)->get();
-
-        $done_task = $done_task->count();
-        $tasks = $tasks->count();
+        $done_task = count($tasks->where('is_done', 1)->all());
 
         return response()->json([
-            'task_count' => $task,
+            'task_count' => count($tasks),
             'done_task' => $done_task
         ],200);
     }
