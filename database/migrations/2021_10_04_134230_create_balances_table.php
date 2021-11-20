@@ -16,7 +16,7 @@ class CreateBalancesTable extends Migration
         Schema::create('balances', function (Blueprint $table) {
             $table->id();
             $table->string('balance_description')->nullable();
-            $table->timestamp('date')->nullable();
+            $table->date('date')->nullable();
             $table->float('nominal');
             $table->boolean('is_income')->default(true);
             $table->string('status');
