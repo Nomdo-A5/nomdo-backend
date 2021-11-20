@@ -269,4 +269,16 @@ class WorkspaceController extends Controller
             'task_done' => $task_done
         ],200);
     }
+    public function getMember(Request $request){
+        $workspace = Workspace::firstWhere('id', $request->workspace_id);
+        if(!$workspace){
+            return response()->json([
+                'message' => 'workspace unavailable'
+            ],404);
+        }
+
+        return response()->json([
+            'member' => $workspace->users()->get()
+        ],404);
+    }
 }
