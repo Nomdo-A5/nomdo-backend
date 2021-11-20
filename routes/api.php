@@ -41,6 +41,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/task', [TaskController::class, 'index']);
     Route::patch('/task',[TaskController::class, 'update']);
     Route::delete('/task',[TaskController::class, 'delete']);
+    Route::get('/task/member',[TaskController::class, 'getMember']);
 
     Route::post('/balance', [BalanceController::class,'create']);
     Route::delete('/balance', [BalanceController::class,'delete']);

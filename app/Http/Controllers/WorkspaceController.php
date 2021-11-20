@@ -279,6 +279,6 @@ class WorkspaceController extends Controller
 
         return response()->json([
             'member' => $workspace->users()->get()
-        ],404);
+        ],200);
     }
 }
