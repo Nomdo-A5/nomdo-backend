@@ -9,11 +9,18 @@ class Balance extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'is_income',
-        'nominal',
         'balance_description',
+        'date',
+        'nominal',
+        'is_income',
+        'status',
+        'attachment_id'
     ];
     public function report(){
         return $this->belongsTo(Report::class, 'report_id', 'id');
+    }
+
+    public function attachment(){
+        return $this->belongTo(Attachment::class,'attachment_id','id');
     }
 }
