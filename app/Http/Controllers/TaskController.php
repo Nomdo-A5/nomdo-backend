@@ -78,7 +78,7 @@ class TaskController extends Controller
         $validator = Validator::make($request->all(),[
             'task_name' => 'required',
             'task_description' => 'string',
-            'due_date' => 'date|date_format:yyyy-mm-dd',
+            'due_date' => 'date|date_format:Y-m-d',
             'board_id' => 'required'
         ],
         [
