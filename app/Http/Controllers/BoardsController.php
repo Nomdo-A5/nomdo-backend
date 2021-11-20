@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Boards;
-use App\Models\Workspaces;
+use App\Models\Workspace;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -252,24 +252,31 @@ class BoardsController extends Controller
     }
 
     public function taskCount(Request $request){
-        $board = $this->getBoard($request->board_id);
-        
-        $tasks = $board->tasks()->get();
+        $board = $this->getBoard($request->board_id);        
+        $tasks = $this->allTask($board);
         if(count($tasks)==0){
             return response()->json([
                 'message' => 'task empty'
             ],404);
         }
-        $done_task = count($tasks->where('is_done', 1)->all());
-
+        $done_task = count($this->doneTask($board));
         return response()->json([
             'task_count' => count($tasks),
             'done_task' => $done_task
         ],200);
     }
 
+    public function allTask(Boards $board){
+        return $board->tasks()->get();
+    }
+    public function doneTask(Boards $board){
+        return $board->tasks()->where('is_done',1)->get();
+    }
     public function getBoard($id){
         return Boards::firstWhere('id',$id);
+    }
+    public function getBoardOfWorkspace(Workspace $workspace){
+        return $workspace->boards()->get();
     }
 
 }
