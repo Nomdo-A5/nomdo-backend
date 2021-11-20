@@ -16,8 +16,11 @@ class CreateBalancesTable extends Migration
         Schema::create('balances', function (Blueprint $table) {
             $table->id();
             $table->string('balance_description')->nullable();
+            $table->timestamps('date');
             $table->float('nominal');
             $table->boolean('is_income')->default(true);
+            $table->string('status');
+            $table->foreignId('attachment_id')->constrained('attachments')->onUpdate('cascade')->onDelete('cascade')->nullable();
             $table->timestamps();
         });
     }
