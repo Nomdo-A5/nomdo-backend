@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\BoardsController;
 
 class WorkspaceController extends Controller
 {
@@ -209,17 +210,6 @@ class WorkspaceController extends Controller
         //     ],404);
         // }
     }
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Workspace  $workspace
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Workspace $workspace)
-    {
-        //
-    }
-
     // Return unique token for url_join
     public function unique_code($limit){
         $token = substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, $limit);
@@ -232,7 +222,6 @@ class WorkspaceController extends Controller
 
         return $token;
     }
-
 
     public function join(Request $request){
         $user = Auth::user();
@@ -258,5 +247,26 @@ class WorkspaceController extends Controller
         else{
             return response()->json($workspace,404);
         }
+    }
+
+    public function getTaskInfo(Request $request){
+        $workspace = Workspace::firstWhere('id', $request->workspace_id);
+        $boards_controller = new BoardsController;
+        $boards = $boards_controller->getBoardOfWorkspace($workspace);
+        if(count($boards) == 0){
+            return response()->json([
+                'message' => 'board unavailable',
+            ],404);
+        }
+        $task_count = 0;
+        $task_done = 0;
+        foreach($boards as $board){
+            $task_count += count($boards_controller->allTask($board));
+            $task_done += count($boards_controller->doneTask($board));
+        }
+        return response()->json([
+            'task_count' => $task_count,
+            'task_done' => $task_done
+        ],200);
     }
 }
