@@ -214,4 +214,16 @@ class TaskController extends Controller
             ],403);
         }
     }
+
+    public function getMember(Request $request){
+        $task = Task::firstWhere('id',$request->task_id);
+        if(!$task){
+            return response()->json([
+                'message' => 'Task unavailable'
+            ],404);
+        }
+        return response()->json([
+            'member' => $task->users()->get()
+        ],200);
+    }
 }
