@@ -78,7 +78,7 @@ class TaskController extends Controller
         $validator = Validator::make($request->all(),[
             'task_name' => 'required',
             'task_description' => 'string',
-            'due_date' => 'date|date_format:Y-m-d',
+            'due_date' => 'date|date_format:yyyy-mm-dd',
             'board_id' => 'required'
         ],
         [
@@ -106,7 +106,7 @@ class TaskController extends Controller
         //check user access with board founded
         $this->userAccess($board);
         $user = Auth::user();
-
+        
         $task = new Task([
             'task_name' => $request->task_name,
             'task_description' => $request->task_description,

@@ -27,6 +27,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/boards', [BoardsController::class,'store']);
     Route::patch('/boards',  [BoardsController::class,'update']);
     Route::delete('/boards', [BoardsController::class,'destroy']);
+    Route::get('/boards/task-information', [BoardsController::class,'taskCount']);
 
     Route::post('/workspace', [WorkspaceController::class,'create']);
     Route::get('/workspace', [WorkspaceController::class,'show']);
