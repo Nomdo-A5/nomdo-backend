@@ -251,14 +251,27 @@ class BoardsController extends Controller
         return $workspace;
     }
 
-    public function taskCount(Boards $board){
-        $tasks = $board->task()->get();
-        $done_task = $task->where('is_done',1)->get();
+    public function taskCount(Request $request){
+        $board = $this->getBoard($request->board_id);
+        $tasks = $board->tasks()->get();
+        if(count($tasks) == 0){
+            return response()->json([
+                'message' => 'task empty'
+            ],404);
+        }
+        $done_task = $tasks->where('is_done',1)->get();
 
         $done_task = $done_task->count();
-        $task = $task->count();
+        $tasks = $tasks->count();
 
-        return [$task,$done_task];
+        return response()->json([
+            'task_count' => $task,
+            'done_task' => $done_task
+        ],200);
+    }
+
+    public function getBoard($id){
+        return Boards::firstWhere('id',$id);
     }
 
 }
