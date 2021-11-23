@@ -50,7 +50,7 @@ class WorkspaceController extends Controller
 
         $request->validate([
             'workspace_name'=> 'required',
-            'workspace_description' => 'required',
+            'workspace_description' => 'string',
         ]);
 
         $data = new Workspace([
@@ -197,18 +197,6 @@ class WorkspaceController extends Controller
             ] ,405);
         }
 
-        // $check = Workspace::firstWhere('id', $request->id);
-        // if($check){
-        //     Workspace::destroy($request->id);
-        //     return response()->json([
-        //         'message' => 'Workspace deleted'
-        //     ],200);
-        // }
-        // else{
-        //     return response()->json([
-        //         'message' => 'failed to delete workspace'
-        //     ],404);
-        // }
     }
     // Return unique token for url_join
     public function unique_code($limit){
