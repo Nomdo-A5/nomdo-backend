@@ -16,7 +16,7 @@ class CreateWorkspacesTable extends Migration
         Schema::create('workspaces', function (Blueprint $table) {
             $table->id();
             $table->string('workspace_name');
-            $table->string('workspace_description');
+            $table->string('workspace_description')->nullable();
             $table->string('url_join');
             $table->timestamps();
         });
