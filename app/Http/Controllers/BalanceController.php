@@ -101,6 +101,7 @@ class BalanceController extends Controller
             'balance_description' => $request->balance_description,
             'nominal' => $request->nominal,
             'is_income' => $request->is_income,
+            'status' => $request->status
         ]);
 
         $balance->save();
