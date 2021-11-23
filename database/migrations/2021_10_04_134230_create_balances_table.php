@@ -19,7 +19,7 @@ class CreateBalancesTable extends Migration
             $table->date('date')->nullable();
             $table->float('nominal');
             $table->boolean('is_income')->default(true);
-            $table->string('status');
+            $table->string('status')->nullable();
             //$table->foreignId('attachment_id')->constrained('attachments')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
