@@ -51,11 +51,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::delete('/balance', [BalanceController::class,'delete']);
 
     Route::get('/report', [ReportController::class,'select']);
+    Route::get('/report/overview', [ReportController::class,'overview']);
     Route::post('/report', [ReportController::class,'create']);
 
     Route::post('/balance', [BalanceController::class,'create']);
 
-    Route::post('/attacment/{id}', [AttachmentController::class,'create']);
+    Route::post('/attachment/{id}', [AttachmentController::class,'create']);
 
 
 });
