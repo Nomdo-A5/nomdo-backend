@@ -166,4 +166,5 @@ class ReportController extends Controller
       'message' => 'Balance fetched'
     ],200);
   }
+  
 }
