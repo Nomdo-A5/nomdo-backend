@@ -219,14 +219,19 @@ class WorkspaceController extends Controller
             'url_join' => 'required',
             'member_id' => 'required'
          ]);
+         $device = $user->device_token;
 
          $workspace = Workspace::firstWhere('url_join', $request->url_join);
          if($workspace){
-            $this->addMember($workspace,$request->member_id);
+            $member = User::firstWhere('id', $request->member_id);
+            $message = $workspace->workspace_name . $member->name;
+            $this->addMember($workspace, $request->member_id);
             $is_update = true;
+
          }
 
          if($is_update){
+            auth()->user()->notify(new WorkspaceJoin);
             return response()->json([
                 'workspace' => $workspace,
                 'message' => 'Workspace joined'
@@ -269,4 +274,35 @@ class WorkspaceController extends Controller
             'member' => $workspace->users()->get()
         ],200);
     }
+    // public function sendNotification($device_token, $message)
+    // {
+    //     $SERVER_API_KEY = 'ServerAPIKey';
+
+    //     // payload data, it will vary according to requirement
+    //     $data = [
+    //         "registration_ids" => $device_token, // for single device id
+    //         "notification" => $message
+    //     ];
+    //     $dataString = json_encode($data);
+
+    //     $headers = [
+    //         'Authorization: key=' . $SERVER_API_KEY,
+    //         'Content-Type: application/json',
+    //     ];
+
+    //     $ch = curl_init();
+
+    //     curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+    //     curl_setopt($ch, CURLOPT_POST, true);
+    //     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    //     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    //     curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+
+    //     $response = curl_exec($ch);
+
+    //     curl_close($ch);
+
+    //     return $response;
+    // }
 }
