@@ -36,8 +36,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/join',[WorkspaceController::class ,'join']);
     Route::get('/workspace/task-information', [WorkspaceController::class, 'getTaskInfo']);
     Route::get('/workspace/member', [WorkspaceController::class, 'getMember']);
-
     Route::post('/task', [TaskController::class,'create']);
+
     Route::get('/task', [TaskController::class, 'index']);
     Route::patch('/task',[TaskController::class, 'update']);
     Route::delete('/task',[TaskController::class, 'delete']);
@@ -57,7 +57,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('/attacment/{id}', [AttachmentController::class,'create']);
 
-
+    Route::get('/search',[SearchController::class,'search']);
 });
 //Route::get('/workspace', [WorkspaceController::class,'show']);
 // Route::get('/task', [TaskController::class, 'index']);
