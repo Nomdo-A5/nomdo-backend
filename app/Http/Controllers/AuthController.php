@@ -64,6 +64,8 @@ class AuthController extends Controller
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:6|confirmed',
                 'password_confirmation' => 'required',
+                'firebase_uid' => 'nullable|string',
+                'fcm_token' => 'nullable|string',
             ]);
 
             if($validator->fails()){
@@ -76,7 +78,15 @@ class AuthController extends Controller
             $request['password_confirmation'] = Hash::make($request['password_confirmation']);
             $request['remember_token'] = Str::random(10);
             $user = User::create($request->toArray());
+            if ($request->exists('firebase_uid')) {
+                $user->firebase_uid = $request->firebase_uid;
+                $user->save();
+            }
 
+            if ($request->exists('fcm_token')) {
+                $user->fcm_token = $request->fcm_token;
+                $user->save();
+            }
             return response()->json([
                 'status_code' => 200,
                 'message' => 'Registration Successfull',
@@ -95,7 +105,7 @@ class AuthController extends Controller
         $request->user()->tokens()->delete();
         return response(['message'=>'Logout Successfull']);
     }
-    public function getActiveUser(Request $request){        
+    public function getActiveUser(Request $request){
         return response()->json([
             "user" => $request->user()
         ],200);
