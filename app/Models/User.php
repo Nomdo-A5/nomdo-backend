@@ -30,6 +30,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'fcm_token'
     ];
 
     /**
@@ -47,5 +48,9 @@ class User extends Authenticatable
 
     public function tasks(){
         return $this->belongsToMany(Task::class,'task_members','user_id','task_id');
+    }
+    public function routeNotificationForFcm()
+    {
+        return $this->fcm_token;
     }
 }

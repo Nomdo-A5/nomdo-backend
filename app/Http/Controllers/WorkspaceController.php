@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Workspace;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Boards;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\ReportController;
@@ -223,15 +224,15 @@ class WorkspaceController extends Controller
 
          $workspace = Workspace::firstWhere('url_join', $request->url_join);
          if($workspace){
-            $member = User::firstWhere('id', $request->member_id);
-            $message = $workspace->workspace_name . $member->name;
+
             $this->addMember($workspace, $request->member_id);
+
+            auth()->user()->notify(new WorkspaceJoin);
             $is_update = true;
 
          }
 
          if($is_update){
-            auth()->user()->notify(new WorkspaceJoin);
             return response()->json([
                 'workspace' => $workspace,
                 'message' => 'Workspace joined'
@@ -273,6 +274,46 @@ class WorkspaceController extends Controller
         return response()->json([
             'member' => $workspace->users()->get()
         ],200);
+    }
+
+    public function filterTask(Workspace $workspace, Request $request){
+        $boards = $workspace->boards()->with(['tasks'])->get();
+
+        return response()->json([
+            'boards' => $boards
+        ], 200);
+    }
+
+    public function getTasks(Workspace $workspace, Boards $boards, Request $request)
+    {
+        $tasks = $boards->tasks();
+
+        // ?is_done, value = 1 or 0
+        if ($request->query('is_done')) {
+            $tasks = $tasks->where('is_done', $request->query('is_done'));
+        }
+
+        // ?overdue, value = 1
+        if ($request->query('overdue')) {
+            if ($request->query('overdue') == '1') {
+                $tasks = $tasks
+                    ->where('is_done', '0')
+                    ->where('due_date', '<', date('Y-m-d'));
+            }
+        }
+
+        // ?sort_due, value = desc or asc
+        if ($request->query('sort_due')) {
+            if ($request->query('sort_due') == 'desc') {
+                $tasks = $tasks->orderBy('due_date', 'DESC');
+            } else {
+                $tasks = $tasks->orderBy('due_date', 'ASC');
+            }
+        }
+
+        return response()->json([
+            'tasks' => $tasks->get(),
+        ], 200);
     }
     // public function sendNotification($device_token, $message)
     // {

@@ -33,6 +33,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/workspace', [WorkspaceController::class,'show']);
     Route::delete('/workspace', [WorkspaceController::class,'delete']);
     Route::patch('/workspace', [WorkspaceController::class,'update']);
+    Route::get('/workspace/{workspace}/boards', [WorkspaceController::class,'filterTask']);
+    Route::get('/workspace/{workspace}/boards/{boards}/tasks', [WorkspaceController::class,'getTasks']);
     Route::get('/join',[WorkspaceController::class ,'join']);
     Route::get('/workspace/task-information', [WorkspaceController::class, 'getTaskInfo']);
     Route::get('/workspace/member', [WorkspaceController::class, 'getMember']);
