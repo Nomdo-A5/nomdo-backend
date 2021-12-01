@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Workspace;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Boards;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\ReportController;
@@ -219,11 +220,16 @@ class WorkspaceController extends Controller
             'url_join' => 'required',
             'member_id' => 'required'
          ]);
+         $device = $user->device_token;
 
          $workspace = Workspace::firstWhere('url_join', $request->url_join);
          if($workspace){
-            $this->addMember($workspace,$request->member_id);
+
+            $this->addMember($workspace, $request->member_id);
+
+            auth()->user()->notify(new WorkspaceJoin);
             $is_update = true;
+
          }
 
          if($is_update){
@@ -269,4 +275,75 @@ class WorkspaceController extends Controller
             'member' => $workspace->users()->get()
         ],200);
     }
+
+    public function filterTask(Workspace $workspace, Request $request){
+        $boards = $workspace->boards()->with(['tasks'])->get();
+
+        return response()->json([
+            'boards' => $boards
+        ], 200);
+    }
+
+    public function getTasks(Workspace $workspace, Boards $boards, Request $request)
+    {
+        $tasks = $boards->tasks();
+
+        // ?is_done, value = 1 or 0
+        if ($request->query('is_done')) {
+            $tasks = $tasks->where('is_done', $request->query('is_done'));
+        }
+
+        // ?overdue, value = 1
+        if ($request->query('overdue')) {
+            if ($request->query('overdue') == '1') {
+                $tasks = $tasks
+                    ->where('is_done', '0')
+                    ->where('due_date', '<', date('Y-m-d'));
+            }
+        }
+
+        // ?sort_due, value = desc or asc
+        if ($request->query('sort_due')) {
+            if ($request->query('sort_due') == 'desc') {
+                $tasks = $tasks->orderBy('due_date', 'DESC');
+            } else {
+                $tasks = $tasks->orderBy('due_date', 'ASC');
+            }
+        }
+
+        return response()->json([
+            'tasks' => $tasks->get(),
+        ], 200);
+    }
+    // public function sendNotification($device_token, $message)
+    // {
+    //     $SERVER_API_KEY = 'ServerAPIKey';
+
+    //     // payload data, it will vary according to requirement
+    //     $data = [
+    //         "registration_ids" => $device_token, // for single device id
+    //         "notification" => $message
+    //     ];
+    //     $dataString = json_encode($data);
+
+    //     $headers = [
+    //         'Authorization: key=' . $SERVER_API_KEY,
+    //         'Content-Type: application/json',
+    //     ];
+
+    //     $ch = curl_init();
+
+    //     curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+    //     curl_setopt($ch, CURLOPT_POST, true);
+    //     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    //     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    //     curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+
+    //     $response = curl_exec($ch);
+
+    //     curl_close($ch);
+
+    //     return $response;
+    // }
 }

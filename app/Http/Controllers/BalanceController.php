@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Balance;
 use App\Models\Report;
 use App\Models\Workspace;
+use App\Models\Attachment;
+
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -18,35 +20,34 @@ class BalanceController extends Controller
     public function index(Request $request){
 
         //fetch specific balance with balance id as id
-        if($request->id){
-            $balance = Balance::find($request->id);
-            if(!$balance){
-                return response()->json([
-                    'message' => 'Balance unavailable',
-                    'balance' => $balance,
-                ],404);
-            }
+        if($request->balance_id){
+            $balance = Balance::find($request->balance_id);
+
+            $attachment = Attachment::where('balance_id',$request->balance_id)->first();
             return response()->json([
+                'message' => 'Success with Attachment',
                 'balance' => $balance,
+                'attachment' => $attachment
             ],200);
         }
 
-        // fetch all balance in one report
-        if($request->report_id){
-            $report = Report::find($request->report_id);
-            if(!$report){
-                return response()->json([
-                    'message' => 'Report unavailable',
-                    'report' => $report,
-                ],404);
-            }
-            $balance = $report->balances();
-            if($balance != null){
-                return response()->json([
-                    'balance' => $balance
-                ],200);
-            }
-        }
+        // // fetch all balance in one report
+        // if($request->report_id){
+        //     $report = Report::find($request->report_id);
+        //     if(!$report){
+        //         return response()->json([
+        //             'message' => 'Report unavailable',
+        //             'report' => $report,
+        //         ],404);
+        //     }
+        //     $balance = $report->balances();
+        //     if($balance != null){
+        //         return response()->json([
+        //             'balance' => $balance
+        //         ],200);
+        //     }
+        // }
+
     }
 
     public function create(Request $request)
@@ -103,6 +104,7 @@ class BalanceController extends Controller
             'nominal' => $request->nominal,
             'is_income' => $request->is_income,
             'status' => $request->status,
+            'attachment_id'=> $request->attachment_id
         ]);
 
         $balance->save();

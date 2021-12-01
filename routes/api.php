@@ -8,6 +8,7 @@ use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BalanceController;
+use App\Http\Controllers\AttachmentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -33,11 +34,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/workspace', [WorkspaceController::class,'show']);
     Route::delete('/workspace', [WorkspaceController::class,'delete']);
     Route::patch('/workspace', [WorkspaceController::class,'update']);
+    Route::get('/workspace/{workspace}/boards', [WorkspaceController::class,'filterTask']);
+    Route::get('/workspace/{workspace}/boards/{boards}/tasks', [WorkspaceController::class,'getTasks']);
     Route::get('/join',[WorkspaceController::class ,'join']);
     Route::get('/workspace/task-information', [WorkspaceController::class, 'getTaskInfo']);
     Route::get('/workspace/member', [WorkspaceController::class, 'getMember']);
-
     Route::post('/task', [TaskController::class,'create']);
+
     Route::get('/task', [TaskController::class, 'index']);
     Route::patch('/task',[TaskController::class, 'update']);
     Route::delete('/task',[TaskController::class, 'delete']);
@@ -56,9 +59,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('/balance', [BalanceController::class,'create']);
 
-    Route::post('/attachment/{id}', [AttachmentController::class,'create']);
+    Route::post('/attachment', [AttachmentController::class,'create']);
 
-
+    Route::get('/search',[SearchController::class,'search']);
 });
 //Route::get('/workspace', [WorkspaceController::class,'show']);
 // Route::get('/task', [TaskController::class, 'index']);
