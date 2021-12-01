@@ -1,17 +1,20 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Attachment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AttachmentController extends Controller
 {
-    public function create(){
+    public function create(Request $request){
         $validator = Validator::make($request->all(),[
             'file_path' => 'required|mimes:jpeg,png|max:1014',
+            'balance_id' => 'required',
         ],
         [
             'file_path.required' => 'Input File Attachment!',
+            'balance_id.required' => 'Need balance_id!',
 
         ]);
 
@@ -22,20 +25,13 @@ class AttachmentController extends Controller
                 'data'    => $validator->errors()
             ],400);
         }
-        $task = Task::find($request->id_task);
-        if(!$task){
-            return response()->json([
-                'message' => 'task unavailable',
-                'task' => $task,
-            ],404);
-        }
         $file = $request->file('file_path');
         $nama_file = $file->getClientOriginalName();
         $tujuan_upload = 'file';
         $file->move($tujuan_upload, $nama_file);
         $attachment = new Attachment([
-           'id_task'=> $task,
-           'file_path'=> $nama_file
+           'file_path'=> $nama_file,
+           'balance_id'=> $request->balance_id
         ]);
         $attachment->save();
 
@@ -43,7 +39,7 @@ class AttachmentController extends Controller
             return response()->json([
                 'message' => 'Attachment created',
                 'attachment'   => $attachment,
-            ], 201);
+            ], 200);
         } else {
             return response()->json([
                 'success' => false,

@@ -8,6 +8,7 @@ use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BalanceController;
+use App\Http\Controllers\AttachmentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -58,7 +59,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('/balance', [BalanceController::class,'create']);
 
-    Route::post('/attachment/{id}', [AttachmentController::class,'create']);
+    Route::post('/attachment', [AttachmentController::class,'create']);
 
     Route::get('/search',[SearchController::class,'search']);
 });

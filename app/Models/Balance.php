@@ -14,7 +14,7 @@ class Balance extends Model
         'nominal',
         'is_income',
         'status',
-        'attachment_id'
+
     ];
     public function report(){
         return $this->belongsTo(Report::class, 'report_id', 'id');
