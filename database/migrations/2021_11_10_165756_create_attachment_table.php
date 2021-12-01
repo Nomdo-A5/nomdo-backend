@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAttachmentTabel extends Migration
+class CreateAttachmentTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,8 +15,9 @@ class CreateAttachmentTabel extends Migration
     {
         Schema::create('attachment', function (Blueprint $table) {
             $table->id();
-            $table->integer('id_task');
             $table->string('file_path');
+            $table->foreignId('balance_id')->constrained('balances')->onUpdate('cascade')->onDelete('cascade');
+
             $table->timestamps();
         });
     }
