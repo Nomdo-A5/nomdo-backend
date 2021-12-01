@@ -99,9 +99,10 @@ class BalanceController extends Controller
 
         $balance = new Balance([
             'balance_description' => $request->balance_description,
+            'date' => $request->date,
             'nominal' => $request->nominal,
             'is_income' => $request->is_income,
-            'status' => $request->status
+            'status' => $request->status,
         ]);
 
         $balance->save();
