@@ -39,7 +39,7 @@ class BoardsController extends Controller
             $boards = $workspace->boards()->where('id', $request->id)->first();
         }
 
-        if(count($boards) == 0){
+        if(!$boards){
             return response()->json([
                 'message' => 'Boards unavailable'
             ],404);
@@ -256,8 +256,9 @@ class BoardsController extends Controller
         $tasks = $this->allTask($board);
         if(count($tasks)==0){
             return response()->json([
-                'message' => 'task empty'
-            ],404);
+                'task_count' => count($tasks),
+                'done_task' => 0
+            ],200);
         }
         $done_task = count($this->doneTask($board));
         return response()->json([
