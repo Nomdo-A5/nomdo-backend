@@ -226,8 +226,8 @@ class WorkspaceController extends Controller
          if($workspace){
 
             $this->addMember($workspace, $request->member_id);
-
-            auth()->user()->notify(new WorkspaceJoin);
+            $user= User::where('id','=','member_id')->get();
+            $user->notify(new WorkspaceJoin);
             $is_update = true;
 
          }

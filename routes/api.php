@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoardsController;
 use App\Http\Controllers\WorkspaceController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BalanceController;
@@ -60,8 +61,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/balance', [BalanceController::class,'create']);
 
     Route::post('/attachment', [AttachmentController::class,'create']);
-
+Route::get('/attachment',[AttachmentController::class,'getDownload']);
     Route::get('/search',[SearchController::class,'search']);
+
+
 });
 //Route::get('/workspace', [WorkspaceController::class,'show']);
 // Route::get('/task', [TaskController::class, 'index']);
