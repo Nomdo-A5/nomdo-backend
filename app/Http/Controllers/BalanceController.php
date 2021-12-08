@@ -23,11 +23,10 @@ class BalanceController extends Controller
         if($request->balance_id){
             $balance = Balance::find($request->balance_id);
 
-            $attachment = Attachment::where('balance_id',$request->balance_id)->first();
             return response()->json([
                 'message' => 'Success with Attachment',
                 'balance' => $balance,
-                'attachment' => $attachment
+
             ],200);
         }
 
@@ -104,7 +103,7 @@ class BalanceController extends Controller
             'nominal' => $request->nominal,
             'is_income' => $request->is_income,
             'status' => $request->status,
-            'attachment_id'=> $request->attachment_id
+
         ]);
 
         $balance->save();
