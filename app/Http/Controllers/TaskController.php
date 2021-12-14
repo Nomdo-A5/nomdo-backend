@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Task;
 use App\Models\Boards;
+use DateTime;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Builder;
-
+use Illuminate\Support\Facades\DB;
 class TaskController extends Controller
 {
 
@@ -106,7 +108,7 @@ class TaskController extends Controller
         //check user access with board founded
         $this->userAccess($board);
         $user = Auth::user();
-        
+
         $task = new Task([
             'task_name' => $request->task_name,
             'task_description' => $request->task_description,
@@ -130,6 +132,7 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function update(Request $request)
     {
         //
@@ -226,4 +229,61 @@ class TaskController extends Controller
             'member' => $task->users()->get()
         ],200);
     }
+    public function filter(Request $request){
+
+        if ($request->is_done == 1) {
+            $tasks = DB::table('tasks')->where('is_done', $request->is_done)->get();
+            return response()->json([
+                'message' => 'Task done',
+                'tasks' => $tasks
+            ], 200);
+
+        }else if($request->is_done == 0){
+            $tasks = DB::table('tasks')->where('is_done', $request->is_done)->get();
+            return response()->json([
+                'message' => 'Task not done',
+                'tasks' => $tasks
+            ], 200);
+        }
+
+    }
+public function filterdue_date(Request $request){
+    if(($request->is_done == 0) && ($request->due_date == "Today") ){
+        $tasks = DB::table('tasks')
+        ->where('is_done',$request->is_done)
+        ->whereDate('due_date', Carbon::today())->get();
+
+        return response()->json([
+            'message' => 'Task Today',
+            'tasks' => $tasks
+        ], 200);
+    }
+
+    else if (($request->is_done==0)&&($request->due_date =="overdue")){
+        $fdate = now();
+        $datetime1 = new DateTime($fdate);
+        $tasks = DB::table('tasks')
+            ->whereDate('due_date' ,'<', $datetime1)
+            ->get();
+            return response()->json([
+                'message' => 'Task overdue',
+                'tasks' => $tasks
+            ], 200);
+    }
+    else if (($request->is_done==0)&&($request->due_date =="week")){
+        $tasks = DB::table('tasks')->whereDate('due_date', '<', Carbon::now()->subDays(7)->toDateTimeString())->get();
+            return response()->json([
+                'message' => 'Task week',
+                'tasks' => $tasks
+            ], 200);
+    }
+    else if (($request->is_done==0)&&($request->due_date =="later")){
+        $tasks = DB::table('tasks')->whereDate('due_date', '>', Carbon::now()->subDays(7)->toDateTimeString())->get();
+            return response()->json([
+                'message' => 'Task Later',
+                'tasks' => $tasks
+            ], 200);
+    }
+}
+
 }

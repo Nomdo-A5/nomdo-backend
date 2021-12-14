@@ -128,8 +128,8 @@ class BalanceController extends Controller
         $balance = Balance::firstWhere('id', $request->id);
             if($balance == null){
                 return response()->json([
-                    'report' => $report,
-                    'message' => 'Report unavailable'
+                    'balance' => $balance,
+                    'message' => 'Balance unavailable'
                 ],404);
             }
         if($balance){
