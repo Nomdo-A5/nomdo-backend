@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BoardsController;
+use App\Notifications\WorskpaceJoin;
 
 class WorkspaceController extends Controller
 {
@@ -21,19 +22,19 @@ class WorkspaceController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        if($request->id){
+        if ($request->id) {
             $check = Workspace::firstWhere('id', $request->id);
-            if(!$check)
+            if (!$check)
                 return response()->json([
                     'message' => 'Workspace Unavailable'
-                ],404);
+                ], 404);
 
             $workspace = Workspace::find($request->id);
 
             return response()->json([
                 'workspace' => $workspace,
                 'message' => 'Workspace fetched'
-            ],200);
+            ], 200);
         }
         //get all data whoever the user
         return response()->json(Workspace::all(), 200);
@@ -50,7 +51,7 @@ class WorkspaceController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'workspace_name'=> 'required',
+            'workspace_name' => 'required',
             'workspace_description' => 'string',
         ]);
 
@@ -64,7 +65,7 @@ class WorkspaceController extends Controller
 
         $workspace_id = $data->id;
         $user->workspaces()->attach($workspace_id);
-        $user->workspaces()->updateExistingPivot($workspace_id,['is_owner' => true , 'is_admin' => true]);
+        $user->workspaces()->updateExistingPivot($workspace_id, ['is_owner' => true, 'is_admin' => true]);
         $report_controller = new ReportController;
         $report_controller->create($workspace_id);
 
@@ -86,19 +87,19 @@ class WorkspaceController extends Controller
     {
         //
         $user = Auth::user();
-        if($request->id){
-            $workspace = $user->workspaces()->where('workspace_id' , $request->id)->first();
-            if(!$workspace){
+        if ($request->id) {
+            $workspace = $user->workspaces()->where('workspace_id', $request->id)->first();
+            if (!$workspace) {
                 return response()->json([
                     'workspace' => $workspace,
                     'message' => 'workspace unavailable',
-                ],404);
+                ], 404);
             }
-            return response()->json($workspace,200);
+            return response()->json($workspace, 200);
         }
         return response()->json([
             'workspace' => $user->workspaces()->get(),
-        ],200);
+        ], 200);
     }
     /**
      * Update the specified resource in storage.
@@ -120,49 +121,45 @@ class WorkspaceController extends Controller
         ]);
 
         //mengecek apakah workspace dengan ID tersebut adalah milik user yang sedang aktif
-        $workspace = $user->workspaces()->where('workspace_id' , $request->id)->first();
-        if(!$workspace){
-            return response()->json($workspace,404);
+        $workspace = $user->workspaces()->where('workspace_id', $request->id)->first();
+        if (!$workspace) {
+            return response()->json($workspace, 404);
         }
 
         //Checking the user access on that workspace
-        if($workspace->pivot->is_owner == true || $workspace->pivot->is_admin == true){
+        if ($workspace->pivot->is_owner == true || $workspace->pivot->is_admin == true) {
             //Update name
-            if($request->workspace_name){
-                $this->updateName($workspace,$request->workspace_name);
+            if ($request->workspace_name) {
+                $this->updateName($workspace, $request->workspace_name);
                 $is_update = true;
             }
 
             //adding member
-            if($request->member_id){
+            if ($request->member_id) {
                 $this->addMember($workspace, $request->member_id);
                 $is_update = true;
             }
-
-        }
-        else{
+        } else {
             return response()->json([
                 'message' => "access denied",
-            ],405);
+            ], 405);
         }
 
         //jika terjadi perubahan
-        if($is_update){
+        if ($is_update) {
             return response()->json([
                 'workspace' => $workspace,
                 'message' => 'Workspace updated'
-            ],200);
+            ], 200);
+        } else {
+            return response()->json($workspace, 304);
         }
-        else{
-            return response()->json($workspace,304);
-        }
-
-
     }
     /**
      * Updating workspace name
      */
-    public function updateName(Workspace $workspace,String $name){
+    public function updateName(Workspace $workspace, String $name)
+    {
         $workspace->workspace_name = $name;
         $workspace->save();
     }
@@ -170,41 +167,42 @@ class WorkspaceController extends Controller
     /**
      * Updating member of workspace
      */
-    public function addMember(Workspace $workspace, int $id){
+    public function addMember(Workspace $workspace, int $id)
+    {
         $workspace->users()->attach($id);
     }
     /**
      * Delete the specific object
      */
-    public function delete(Request $request){
+    public function delete(Request $request)
+    {
         //check hak akses user terhadap worksapce tersebut
         $user = Auth::user();
 
-        $workspace = $user->workspaces()->where('workspace_id' , $request->id)->first();
-        if(!$workspace){
-            return response()->json($workspace,404);
+        $workspace = $user->workspaces()->where('workspace_id', $request->id)->first();
+        if (!$workspace) {
+            return response()->json($workspace, 404);
         }
 
         //checking user access permission
-        if($workspace->pivot->is_owner == true){
+        if ($workspace->pivot->is_owner == true) {
             Workspace::destroy($workspace->id);
             return response()->json([
                 'message' => 'workspace deleted'
-            ],200);
-        }
-        else{
+            ], 200);
+        } else {
             return response()->json([
                 'message' => 'access denied'
-            ] ,405);
+            ], 405);
         }
-
     }
     // Return unique token for url_join
-    public function unique_code($limit){
+    public function unique_code($limit)
+    {
         $token = substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, $limit);
         $check = Workspace::firstWhere('url_join', $token);
 
-        while($check){
+        while ($check) {
             $token = substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, $limit);
             $check = Workspace::firstWhere('url_join', $token);
         }
@@ -212,71 +210,101 @@ class WorkspaceController extends Controller
         return $token;
     }
 
-    public function join(Request $request){
+    public function join(Request $request)
+    {
         $user = Auth::user();
         $is_update = false;
 
         $request->validate([
             'url_join' => 'required',
             'member_id' => 'required'
-         ]);
-         $device = $user->device_token;
+        ]);
+        $device = $user->device_token;
 
-         $workspace = Workspace::firstWhere('url_join', $request->url_join);
-         if($workspace){
+        $workspace = Workspace::firstWhere('url_join', $request->url_join);
+        if ($workspace) {
 
             $this->addMember($workspace, $request->member_id);
-            $user= User::where('id','=','member_id')->get();
-            $user->notify(new WorkspaceJoin);
+            $user = User::where('id', '=', 'member_id')->get();
+            $user->notify(new WorskpaceJoin);
             $is_update = true;
+        }
 
-         }
-
-         if($is_update){
+        if ($is_update) {
             return response()->json([
                 'workspace' => $workspace,
                 'message' => 'Workspace joined'
-            ],200);
-        }
-        else{
-            return response()->json($workspace,404);
+            ], 200);
+        } else {
+            return response()->json($workspace, 404);
         }
     }
 
-    public function getTaskInfo(Request $request){
+    public function getTaskInfo(Request $request)
+    {
         $workspace = Workspace::firstWhere('id', $request->workspace_id);
         $boards_controller = new BoardsController;
         $boards = $boards_controller->getBoardOfWorkspace($workspace);
-        if(count($boards) == 0){
+        if (count($boards) == 0) {
             return response()->json([
                 'message' => 'board unavailable',
-            ],404);
+            ], 404);
         }
         $task_count = 0;
         $task_done = 0;
-        foreach($boards as $board){
+        foreach ($boards as $board) {
             $task_count += count($boards_controller->allTask($board));
             $task_done += count($boards_controller->doneTask($board));
         }
         return response()->json([
             'task_count' => $task_count,
             'task_done' => $task_done
-        ],200);
+        ], 200);
     }
-    public function getMember(Request $request){
+
+    public function getBoardInfo(Request $request)
+    {
         $workspace = Workspace::firstWhere('id', $request->workspace_id);
-        if(!$workspace){
+        $boards_controller = new BoardsController;
+        $boards = $boards_controller->getBoardOfWorkspace($workspace);
+        if (count($boards) == 0) {
+            return response()->json([
+                'message' => 'board unavailable',
+            ], 404);
+        }
+
+        $i = [];
+        $j = 0;
+        foreach ($boards as $board) {
+            $i[$j++] = $boards_controller->taskCountArray($board->id);
+            // $j[] = $boards_controller->doneTask($board);
+            // $task_count[$i] = $boards_controller->allTask($board);
+            // $task_done[$i++] = $boards_controller->doneTask($board);
+        }
+        return response()->json([
+            // 'task_count' => $task_count,
+            // 'task_done' => $task_done
+            'task_info' => $i
+        ], 200);
+    }
+
+
+    public function getMember(Request $request)
+    {
+        $workspace = Workspace::firstWhere('id', $request->workspace_id);
+        if (!$workspace) {
             return response()->json([
                 'message' => 'workspace unavailable'
-            ],404);
+            ], 404);
         }
 
         return response()->json([
             'member' => $workspace->users()->get()
-        ],200);
+        ], 200);
     }
 
-    public function filterTask(Workspace $workspace, Request $request){
+    public function filterTask(Workspace $workspace, Request $request)
+    {
         $boards = $workspace->boards()->with(['tasks'])->get();
 
         return response()->json([
