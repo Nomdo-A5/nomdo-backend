@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\TaskNotif;
 
 class TaskController extends Controller
 {
@@ -345,15 +346,30 @@ class TaskController extends Controller
     }
     public function tasknotif(Request $request)
     {
-        $task = Task::firstWhere('id', $request->task_id);
-        if ($task) {
-            $tasks = DB::table('tasks')->whereDate('due_date', '<', Carbon::now()->subDays(7)->toDateTimeString())->get();
-            $tasks->notify(new TaskNotif);
+        if ($request->board_id) {
+            $board = Boards::find($request->board_id);
+            if (!$board) {
+                return response()->json([
+                    'message' => 'Board unavailable',
+                    'board' => $board,
+                ], 404);
+            }
 
-            return response()->json([
-                'message' => 'Task Mendekati deadline',
-                'tasks' => $tasks
-            ], 200);
+            $this->userAccess($board);
+
+
+            if ($request->task_id) {
+                $tasks = $board->tasks
+                    ->where('task_id', $request->task_id);
+                $tasks = DB::table('tasks')->whereDate('due_date', '<', Carbon::now()->subDays(7)->toDateTimeString())->get();
+                $user = User::where('id', '=', 'member_id')->get();
+                $user->notify(new TaskNotif);
+
+                return response()->json([
+                    'message' => 'Task Mendekati deadline',
+                    'tasks' => $tasks
+                ], 200);
+            }
         }
     }
 }
