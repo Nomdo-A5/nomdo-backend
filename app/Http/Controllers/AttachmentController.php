@@ -2,14 +2,39 @@
 
 namespace App\Http\Controllers;
 use App\Models\Attachment;
+use App\Models\Balance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Response;
 class AttachmentController extends Controller
 {
+        public function getDownload(Request $request){
+            $balance = Balance::find($request->balance_id);
+            $attachment = Attachment::where('balance_id',$request->balance_id)->first();
+            $file = public_path('file/'.$attachment->file_path);
+
+            // if(!$attachment){
+            //     return response()->json([
+            //         'message' => 'Attachment unavailable',
+            //         'balance' => $balance,
+            //         'attachment' => $attachment,
+            //         'file_path'=> $file_path
+            //         ],404);
+            // }
+            // if($attachment){
+            // return response()->json([
+            //     'message' => 'Attachment download',
+            //     'balance' => $balance,
+            //     'attachment' => $attachment,
+            //     'file_path'=> $file_path
+            //     ],202);
+            // }
+            return response()->download($file);
+        }
     public function create(Request $request){
         $validator = Validator::make($request->all(),[
-            'file_path' => 'required|mimes:jpeg,png,jpg|max:2048',
+
+            'file_path' => 'required|mimes:jpeg,png,doc,docx,pdf|max:1014',
             'balance_id' => 'required',
         ],
         [
