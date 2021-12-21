@@ -44,15 +44,16 @@ class TaskController extends Controller
                     ->where('is_done', $request->is_done);
 
                 if ($request->is_done == 1) {
+                    $task_done = $task->values();
+                    
                     return response()->json([
                         'message' => 'Task done',
-                        'tasks' => $task
+                        'tasks' => $task_done
                     ], 200);
                 } else if ($request->is_done == 0) {
                     if ($request->due_date != null) {
                         if ($request->due_date == "Today") {
-                            $task_date = $board->tasks
-                                ->where('is_done', $request->is_done)
+                            $task_date = $task
                                 ->where('due_date', Carbon::today()->toDateString())
                                 ->values();
                             return response()->json([
