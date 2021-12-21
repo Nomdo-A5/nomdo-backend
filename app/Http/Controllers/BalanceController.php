@@ -31,22 +31,22 @@ class BalanceController extends Controller
             ],200);
         }
 
-        // // fetch all balance in one report
-        // if($request->report_id){
-        //     $report = Report::find($request->report_id);
-        //     if(!$report){
-        //         return response()->json([
-        //             'message' => 'Report unavailable',
-        //             'report' => $report,
-        //         ],404);
-        //     }
-        //     $balance = $report->balances();
-        //     if($balance != null){
-        //         return response()->json([
-        //             'balance' => $balance
-        //         ],200);
-        //     }
-        // }
+         //fetch all balance in one report
+        if($request->report_id){
+            $report = Report::find($request->report_id);
+            if(!$report){
+                return response()->json([
+                    'message' => 'Report unavailable',
+                    'report' => $report,
+                ],404);
+            }
+            $balance = $report->balances();
+            if($balance != null){
+                return response()->json([
+                    'balance' => $balance
+                ],200);
+            }
+        }
 
     }
 
@@ -113,7 +113,7 @@ class BalanceController extends Controller
         if ($balance) {
             return response()->json([
                 'message' => 'Balance created',
-                'board'   => $balance,
+                'balance'   => $balance,
             ], 201);
         } else {
             return response()->json([
@@ -138,11 +138,12 @@ class BalanceController extends Controller
             $balance->is_income=$request->is_income;
             $balance->nominal=$request->nominal;
             $balance->balance_description=$request->balance_description;
+            $balance->status=$request->status;
         }
         $balance->save();
         return response()->json([
             'balance' => $balance,
-            'message' => 'task updated'
+            'message' => 'Balance updated'
         ],200);
     }
 

@@ -36,34 +36,28 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::patch('/workspace', [WorkspaceController::class,'update']);
     Route::get('/workspace/{workspace}/boards', [WorkspaceController::class,'filterTask']);
     Route::get('/workspace/{workspace}/boards/{boards}/tasks', [WorkspaceController::class,'getTasks']);
-    Route::get('/join',[WorkspaceController::class ,'join']);
     Route::get('/workspace/task-information', [WorkspaceController::class, 'getTaskInfo']);
     Route::get('/workspace/member', [WorkspaceController::class, 'getMember']);
+    Route::get('/join',[WorkspaceController::class ,'join']);
+    
     Route::post('/task', [TaskController::class,'create']);
-
     Route::get('/task', [TaskController::class, 'index']);
     Route::patch('/task',[TaskController::class, 'update']);
     Route::delete('/task',[TaskController::class, 'delete']);
     Route::get('/task/member',[TaskController::class, 'getMember']);
 
     Route::post('/balance', [BalanceController::class,'create']);
-    Route::delete('/balance', [BalanceController::class,'delete']);
     Route::get('/balance', [BalanceController::class,'index']);
-
     Route::put('/balance', [BalanceController::class,'update']);
     Route::delete('/balance', [BalanceController::class,'delete']);
-
+    
     Route::get('/report', [ReportController::class,'select']);
     Route::get('/report/overview', [ReportController::class,'overview']);
     Route::post('/report', [ReportController::class,'create']);
-
-    Route::post('/balance', [BalanceController::class,'create']);
 
     Route::post('/attachment', [AttachmentController::class,'create']);
 
     Route::get('/search',[SearchController::class,'search']);
 });
-//Route::get('/workspace', [WorkspaceController::class,'show']);
-// Route::get('/task', [TaskController::class, 'index']);
 Route::post('/register', [AuthController::class,'register']);
 Route::post('/login', [AuthController::class,'login']);

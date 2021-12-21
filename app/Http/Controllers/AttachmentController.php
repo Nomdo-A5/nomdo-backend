@@ -9,7 +9,7 @@ class AttachmentController extends Controller
 {
     public function create(Request $request){
         $validator = Validator::make($request->all(),[
-            'file_path' => 'required|mimes:jpeg,png|max:1014',
+            'file_path' => 'required|mimes:jpeg,png,jpg|max:2048',
             'balance_id' => 'required',
         ],
         [
