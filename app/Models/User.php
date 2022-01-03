@@ -20,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'file_profile'
     ];
 
     /**
@@ -42,12 +43,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function workspaces(){
-        return $this->belongsToMany(Workspace::class,'workspace_members','user_id','workspace_id')->withPivot(['is_owner', 'is_admin']);
+    public function workspaces()
+    {
+        return $this->belongsToMany(Workspace::class, 'workspace_members', 'user_id', 'workspace_id')->withPivot(['is_owner', 'is_admin']);
     }
 
-    public function tasks(){
-        return $this->belongsToMany(Task::class,'task_members','user_id','task_id');
+    public function tasks()
+    {
+        return $this->belongsToMany(Task::class, 'task_members', 'user_id', 'task_id');
     }
     public function routeNotificationForFcm()
     {

@@ -58,6 +58,7 @@ class WorkspaceController extends Controller
         $data = new Workspace([
             'workspace_name' => $request->get('workspace_name'),
             'workspace_description' => $request->get('workspace_description'),
+            'path_workspace' => null,
             'url_join' => $this->unique_code(16),
         ]);
 
@@ -75,7 +76,23 @@ class WorkspaceController extends Controller
             'message' => 'workspace created'
         ], 201);
     }
+    public function update_foto_workspace(Request $request)
+    {
+        $user = Auth::user();
+        $workspace = $user->workspaces()->where('workspace_id', $request->id)->first();
+        $file = $request->file('path_workspace');
+        $nama_file = $file->getClientOriginalName();
+        $tujuan_upload = 'file/workspace';
+        $file->move($tujuan_upload, $nama_file);
 
+        $workspace = Workspace::find($workspace->id)->update([
+            'path_workspace' => $nama_file
+        ]);
+        return response()->json([
+            'workspace' => $workspace,
+            'message' => 'workspace updated'
+        ], 201);
+    }
     /**
      * Display the specified resource.
      *
@@ -131,6 +148,15 @@ class WorkspaceController extends Controller
             //Update name
             if ($request->workspace_name) {
                 $this->updateName($workspace, $request->workspace_name);
+                $is_update = true;
+            }
+
+            if ($request->file('path_workspace')) {
+                $file = $request->file('path_workspace');
+                $nama_file = $file->getClientOriginalName();
+                $tujuan_upload = 'file/workspace';
+                $file->move($tujuan_upload, $nama_file);
+                $this->updateProfile($workspace, $nama_file);
                 $is_update = true;
             }
 
