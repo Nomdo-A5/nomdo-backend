@@ -10,6 +10,8 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\AttachmentController;
+use App\Http\Controllers\ProfileController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -64,7 +66,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::post('/attachment', [AttachmentController::class, 'create']);
     Route::get('/attachment', [AttachmentController::class, 'getDownload']);
+    Route::put('/attachment', [AttachmentController::class, 'update']);
     Route::get('/search', [SearchController::class, 'search']);
+
+    Route::put('/profile', [ProfileController::class, 'updateprofile']);
 });
 //Route::get('/workspace', [WorkspaceController::class,'show']);
 // Route::get('/task', [TaskController::class, 'index']);

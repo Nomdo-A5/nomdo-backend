@@ -55,6 +55,7 @@ class TaskController extends Controller
                                 ->where('is_done', $request->is_done)
                                 ->where('due_date', Carbon::today()->toDateString())
                                 ->values();
+
                             return response()->json([
                                 'message' => 'Task Today',
                                 'tasks' => $task_date

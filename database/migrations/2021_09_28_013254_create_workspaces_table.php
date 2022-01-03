@@ -17,6 +17,7 @@ class CreateWorkspacesTable extends Migration
             $table->id();
             $table->string('workspace_name');
             $table->string('workspace_description')->nullable();
+            $table->string('path_workspace')->nullable();
             $table->string('url_join');
             $table->timestamps();
         });
