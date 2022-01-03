@@ -46,6 +46,33 @@ class AttachmentController extends Controller
             [
                 'file_path.required' => 'Input File Attachment!',
                 'balance_id.required' => 'Need balance_id!',
+            // if(!$attachment){
+            //     return response()->json([
+            //         'message' => 'Attachment unavailable',
+            //         'balance' => $balance,
+            //         'attachment' => $attachment,
+            //         'file_path'=> $file_path
+            //         ],404);
+            // }
+            // if($attachment){
+            // return response()->json([
+            //     'message' => 'Attachment download',
+            //     'balance' => $balance,
+            //     'attachment' => $attachment,
+            //     'file_path'=> $file_path
+            //     ],202);
+            // }
+            return response()->download($file);
+        }
+    public function create(Request $request){
+        $validator = Validator::make($request->all(),[
+
+            'file_path' => 'required|mimes:jpeg,png,doc,docx,pdf|max:1014',
+            'balance_id' => 'required',
+        ],
+        [
+            'file_path.required' => 'Input File Attachment!',
+            'balance_id.required' => 'Need balance_id!',
 
             ]
         );
