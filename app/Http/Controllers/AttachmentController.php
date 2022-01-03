@@ -35,13 +35,11 @@ class AttachmentController extends Controller
         // }
         return response()->download($file);
     }
-
     public function create(Request $request)
     {
         $validator = Validator::make(
             $request->all(),
             [
-
                 'file_path' => 'required|mimes:jpeg,png,doc,docx,pdf|max:1014',
                 'balance_id' => 'required',
             ],
